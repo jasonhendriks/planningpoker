@@ -1,6 +1,6 @@
 ktor:
     application:
         modules:
-            - ca.hendriks.ApplicationKt.module
+          - ca.hendriks.planningpoker.MainKt.module
     deployment:
         port: 8080
