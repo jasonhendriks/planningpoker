@@ -1,18 +1,17 @@
 package ca.hendriks.planningpoker.html
 
-import ca.hendriks.planningpoker.room.RoomRepository
 import kotlinx.html.*
 
-fun HTML.renderIndex(roomRepository: RoomRepository) {
+fun HTML.renderIndex() {
     head {
         script {
-            src = "/assets/htmx.org/dist/htmx.min.js"
+            src = "https://unpkg.com/htmx.org@1.9.10"
         }
         script {
-            src = "/assets/htmx.org/dist/ext/path-params.js"
+            src = "https://unpkg.com/htmx.org/dist/ext/path-params.js"
         }
         script {
-            src = "/assets/htmx.org/dist/ext/sse.js"
+            src = "https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"
         }
         script {
             src = "https://unpkg.com/@tailwindcss/browser@4"
@@ -20,12 +19,7 @@ fun HTML.renderIndex(roomRepository: RoomRepository) {
     }
     body {
         insertHeader()
-        val charlie = roomRepository.findRoom("Charlie")
-        if (charlie == null) {
-            insertJoinRoomForm()
-        } else {
-            insertRoom(charlie)
-        }
+        insertJoinRoomForm()
         insertErrorHandlingScripts()
     }
 }

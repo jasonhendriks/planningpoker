@@ -1,14 +1,14 @@
 package ca.hendriks.planningpoker.routing
 
 import ca.hendriks.planningpoker.html.renderIndex
+import ca.hendriks.planningpoker.html.renderJoinRoomForm
 import ca.hendriks.planningpoker.html.renderRoom
+import ca.hendriks.planningpoker.html.renderSse
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.room.RoomRepository
-import ca.hendriks.planningpoker.room.RoomService
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Conflict
-import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.response.respond
@@ -22,28 +22,47 @@ import org.slf4j.LoggerFactory
 fun Application.configureRouting() {
 
     val logger = LoggerFactory.getLogger("Routing")
-    val roomService = RoomService()
     val roomRepository = RoomRepository()
     roomRepository.createRoom("Charlie")
 
     routing {
         get("/") {
             call.respondHtml {
-                renderIndex(roomRepository)
+                renderIndex()
+            }
+        }
+
+        get("/rooms") {
+            logger.info { "List rooms" }
+            call.respondHtml {
+                renderJoinRoomForm()
             }
         }
 
         route("/rooms/{room-name}") {
             accept(ContentType.Text.Html) {
                 get {
-                    logger.info() { "Rendering room" }
+                    logger.info { "Rendering room" }
                     call.respondHtml {
                         val roomName = call.parameters["room-name"]
                         val charlie = roomRepository.findRoom(roomName!!)!!
                         renderRoom(charlie)
-
                     }
                 }
+                post {
+                    val roomName = call.parameters["room-name"]
+
+                    if (roomName == null) {
+                        call.respond(BadRequest, "room-name is required")
+                        return@post
+                    }
+
+                    val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
+                    call.respondHtml {
+                        renderSse(room)
+                    }
+                }
+
             }
         }
 
@@ -62,7 +81,9 @@ fun Application.configureRouting() {
                 call.respond(Conflict, "User $userName already exists in room $roomName")
                 return@post
             }
-            call.respond(OK, "<h1>Welcome $user to room $roomName</h1>")
+            call.respondHtml {
+                renderSse(room)
+            }
         }
 
     }
