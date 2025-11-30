@@ -50,7 +50,7 @@ ktor {
 
 // Builds OpenAPI specification automatically
 tasks.processResources {
-    dependsOn("buildOpenApi")
+//    dependsOn("buildOpenApi")
 }
 
 dependencies {

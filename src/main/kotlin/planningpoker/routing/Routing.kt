@@ -17,12 +17,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import io.ktor.server.sse.heartbeat
-import io.ktor.server.sse.sse
-import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
-import kotlin.time.Duration.Companion.milliseconds
 
 fun Application.configureRouting() {
 
@@ -49,22 +44,6 @@ fun Application.configureRouting() {
 
                     }
                 }
-            }
-        }
-
-        sse("/sse/{room-name}") {
-            heartbeat {
-                period = 10.milliseconds
-                event = ServerSentEvent("heartbeat")
-            }
-            try {
-                logger.info() { "Client subscribed to SSE" }
-                repeat(100) {
-                    send(ServerSentEvent("this is SSE #$it"))
-                    delay(1000)
-                }
-            } catch (exception: RuntimeException) {
-                logger.info { exception }
             }
         }
 
