@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.ktor)
+    alias(ktorLibs.plugins.ktor)
 }
 
 group = "ca.hendriks"
@@ -39,14 +39,39 @@ val integrationTest = tasks.register<Test>("integrationTest") {
 
 tasks.check { dependsOn(integrationTest) }
 
-dependencies {
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.logback.classic)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.config.yaml)
+ktor {
+    @OptIn(io.ktor.plugin.OpenApiPreview::class)
+    openApi {
+        title = "OpenAPI example"
+        version = "2.1"
+        summary = "This is a sample API"
+    }
+}
 
-    testImplementation(libs.ktor.server.test.host)
+// Builds OpenAPI specification automatically
+tasks.processResources {
+    dependsOn("buildOpenApi")
+}
+
+dependencies {
+    implementation(ktorLibs.server.core)
+    implementation(ktorLibs.server.openapi)
+    implementation(ktorLibs.server.contentNegotiation)
+    implementation(ktorLibs.serialization.kotlinx.json)
+    implementation(ktorLibs.server.auth)
+    implementation(ktorLibs.client.core)
+    implementation(ktorLibs.client.apache)
+    implementation(ktorLibs.server.netty)
+    implementation(ktorLibs.server.config.yaml)
+    implementation(ktorLibs.server.swagger)
+    implementation(ktorLibs.server.sse)
+    implementation(ktorLibs.server.webjars)
+    implementation(ktorLibs.server.htmlBuilder)
+
+    implementation(libs.bundles.htmx)
+    implementation(libs.logback.classic)
+
+    testImplementation(ktorLibs.server.testHost)
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
     testImplementation("io.kotest:kotest-framework-datatest-jvm:5.7.2")

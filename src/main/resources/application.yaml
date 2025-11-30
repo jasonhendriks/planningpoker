@@ -1,6 +1,9 @@
 ktor:
-    application:
-        modules:
-          - ca.hendriks.planningpoker.MainKt.module
-    deployment:
-        port: 8080
+  development: true
+  application:
+    modules:
+      - ca.hendriks.planningpoker.MainKt.module
+  deployment:
+    port: 8080
+    watch:
+      - classes
