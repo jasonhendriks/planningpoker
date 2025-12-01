@@ -11,10 +11,14 @@ fun HTML.renderSse(room: Room) {
 
 fun FlowContent.insertSse(room: Room) {
     div {
+        id = "room"
+        classes = setOf("mx-auto w-full")
         attributes["hx-ext"] = "sse"
         attributes["sse-connect"] = "/sse/sse-${room.name}"
+        attributes["hx-push-url"] = "true"
 
         div {
+            id = "poker-table"
             attributes["hx-get"] = "/rooms/${room.name}"
             attributes["hx-trigger"] = "sse:update"
         }
@@ -28,30 +32,26 @@ fun HTML.renderRoom(room: Room) {
 }
 
 fun FlowContent.insertRoom(room: Room) {
-    div {
-        id = "main"
-        classes = setOf("mx-auto w-full")
+    h1 {
+        +"Welcome to room ${room.name}"
+    }
 
-        h1 {
-            +"Welcome to room ${room.name}"
-        }
+    form {
+        attributes["hx-get"] = "/rooms"
+        attributes["hx-target"] = "#room"
+        attributes["hx-swap"] = "outerHTML"
 
-        form {
-            attributes["hx-get"] = "/rooms"
-            attributes["hx-swap"] = "outerHTML"
+        // Button
+        div {
+            classes = setOf("w-full px-3 sm:w-1/4 pt-8")
 
-            // Button
-            div {
-                classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+            button {
+                classes =
+                    setOf("cursor-pointer rounded-md bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none")
 
-                button {
-                    classes =
-                        setOf("cursor-pointer rounded-md bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none")
-
-                    +"Leave Room"
-                }
+                +"Leave Room"
             }
-
         }
+
     }
 }

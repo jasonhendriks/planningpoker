@@ -10,12 +10,13 @@ fun HTML.renderJoinRoomForm() {
 
 fun FlowContent.insertJoinRoomForm() {
     div {
-        id = "main"
+        id = "room"
         classes = setOf("mx-auto w-full")
 
         form {
-            attributes["hx-post"] = "/rooms/{room-name}"
+            attributes["hx-post"] = "/rooms/{room-name}/users/{user-name}"
             attributes["hx-ext"] = "path-params"
+            attributes["hx-target"] = "#room"
             attributes["hx-swap"] = "outerHTML"
 
             div {
