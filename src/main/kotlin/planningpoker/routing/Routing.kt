@@ -17,6 +17,10 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.get
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
+import io.ktor.util.logging.debug
 import org.slf4j.LoggerFactory
 
 fun Application.configureRouting() {
@@ -57,6 +61,11 @@ fun Application.configureRouting() {
                         return@post
                     }
 
+                    val session = call.sessions.get<UserSession>()
+                    if (session != null) {
+                        logger.debug { "Found user ${session.userName} in session" }
+                    }
+
                     val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
                     call.respondHtml {
                         renderSse(room)
@@ -70,17 +79,27 @@ fun Application.configureRouting() {
             val roomName = call.parameters["room-name"]
             val userName = call.parameters["user-name"]
 
-            if (roomName == null || userName == null) {
-                call.respond(BadRequest, "room-name and user-name are required")
+            if (roomName == null || roomName.trim().isEmpty()) {
+                call.respond(BadRequest, "room-name is required")
+                return@post
+            }
+
+            if (userName == null || userName.trim().isEmpty()) {
+                call.respond(BadRequest, "user-name is required")
                 return@post
             }
 
             val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-            val user = room.addUser(userName)
+            val user = room.addUser(userName!!)
             if (user == null) {
+                logger.debug("User $userName is already in room $roomName")
                 call.respond(Conflict, "User $userName already exists in room $roomName")
                 return@post
             }
+
+            call.sessions.set(UserSession(userName))
+            logger.debug("Set $userName into the session")
+
             call.respondHtml {
                 renderSse(room)
             }

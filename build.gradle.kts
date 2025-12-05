@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(ktorLibs.plugins.ktor)
+    kotlin("plugin.serialization") version "1.9.22" // Or your current Kotlin version
 }
 
 group = "ca.hendriks"
