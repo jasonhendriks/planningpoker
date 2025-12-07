@@ -1,8 +1,9 @@
 package ca.hendriks.planningpoker.html
 
+import ca.hendriks.planningpoker.Room
 import kotlinx.html.*
 
-fun HTML.renderIndex() {
+fun HTML.renderIndex(room: Room? = null) {
     head {
         script {
             src = "https://unpkg.com/htmx.org@1.9.10"
@@ -19,7 +20,11 @@ fun HTML.renderIndex() {
     }
     body {
         insertHeader()
-        insertJoinRoomForm()
+        if (room == null) {
+            insertJoinRoomForm()
+        } else {
+            insertSse(room)
+        }
         insertErrorHandlingScripts()
     }
 }

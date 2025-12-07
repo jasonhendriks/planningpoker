@@ -1,7 +1,16 @@
 package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Room
-import kotlinx.html.*
+import kotlinx.html.FlowContent
+import kotlinx.html.HTML
+import kotlinx.html.body
+import kotlinx.html.button
+import kotlinx.html.classes
+import kotlinx.html.div
+import kotlinx.html.form
+import kotlinx.html.h1
+import kotlinx.html.id
+import kotlinx.html.stream.createHTML
 
 fun HTML.renderSse(room: Room) {
     body {
@@ -25,33 +34,33 @@ fun FlowContent.insertSse(room: Room) {
     }
 }
 
-fun HTML.renderRoom(room: Room) {
-    body {
-        insertRoom(room)
-    }
-}
+fun insertRoomFragment(room: Room) =
 
-fun FlowContent.insertRoom(room: Room) {
-    h1 {
-        +"Welcome to room ${room.name}"
-    }
+    createHTML().div {
 
-    form {
-        attributes["hx-get"] = "/rooms"
-        attributes["hx-target"] = "#room"
-        attributes["hx-swap"] = "outerHTML"
+        id = "room-${room.name}"
 
-        // Button
-        div {
-            classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+        h1 {
+            +"Welcome to room ${room.name}"
+        }
 
-            button {
-                classes =
-                    setOf("cursor-pointer rounded-md bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none")
+        form {
+            attributes["hx-get"] = "/rooms"
+            attributes["hx-target"] = "#room"
+            attributes["hx-swap"] = "outerHTML"
 
-                +"Leave Room"
+            // Button
+            div {
+                classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+
+                button {
+                    classes =
+                        setOf("cursor-pointer rounded-md bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none")
+
+                    +"Leave Room"
+                }
             }
+
         }
 
     }
-}
