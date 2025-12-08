@@ -29,6 +29,8 @@ import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 import kotlin.uuid.ExperimentalUuidApi
 
+val LOBBY_PATH = "/lobby"
+
 @OptIn(ExperimentalUuidApi::class)
 fun Application.configureRouting() {
 
@@ -44,8 +46,10 @@ fun Application.configureRouting() {
             }
         }
 
-        get("/rooms") {
+        get(LOBBY_PATH) {
             logger.info { "List rooms" }
+            val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+            usersToRoom.unassignUser(userSession.user)
             call.respondHtml {
                 renderJoinRoomForm()
             }
@@ -106,8 +110,8 @@ fun Application.configureRouting() {
 
             val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
             val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-            userSession.user.name = userName
             usersToRoom.assignUserToRoom(userSession.user, room)
+            userSession.user.name = userName
             logger.debug("Set $userName into the session")
 
             call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)

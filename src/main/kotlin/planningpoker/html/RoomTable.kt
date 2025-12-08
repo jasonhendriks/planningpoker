@@ -1,6 +1,7 @@
 package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Room
+import ca.hendriks.planningpoker.routing.LOBBY_PATH
 import kotlinx.html.button
 import kotlinx.html.classes
 import kotlinx.html.div
@@ -29,7 +30,7 @@ fun insertRoomFragment(room: Room) = createHTML()
         }
 
         form {
-            attributes["hx-get"] = "/rooms"
+            attributes["hx-get"] = LOBBY_PATH
             attributes["hx-target"] = "#room"
             attributes["hx-swap"] = "outerHTML"
 
