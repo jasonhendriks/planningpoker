@@ -18,6 +18,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.header
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.get
 import io.ktor.server.sessions.getOrSet
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
@@ -43,9 +44,12 @@ fun Application.configureRouting() {
             header("HX-Request", "true") {
                 get(LOBBY_PATH) {
                     logger.info { "HTMX -> Back to Lobby" }
-                    val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-                    usersToRoom.unassignUser(userSession.user)
-                    call.respondText(createHTML().div { insertJoinRoomForm() }, contentType = ContentType.Text.Html)
+                    val userSession: UserSession? = call.sessions.get()
+                    val user = userSession?.user
+                    if (user != null) {
+                        usersToRoom.unassignUser(user)
+                    }
+                    call.respondText(createHTML().div { insertJoinRoomForm(user) }, contentType = ContentType.Text.Html)
                 }
             }
             get(LOBBY_PATH) {
@@ -67,17 +71,19 @@ fun Application.configureRouting() {
                         call.respond(BadRequest, "room-name is required")
                         return@get
                     }
-
-                    if (userName == null || userName.trim().isEmpty()) {
-                        call.respond(BadRequest, "user-name is required")
-                        return@get
-                    }
-
                     val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-                    val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-                    usersToRoom.assignUserToRoom(userSession.user, room)
-                    userSession.user.name = userName
-                    logger.debug("Set $userName into the session")
+
+                    if (userName != null && !userName.trim().isEmpty()) {
+                        val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+                        usersToRoom.assignUserToRoom(userSession.user, room)
+                        userSession.user.name = userName
+                        logger.debug("Set $userName into the session")
+                    } else {
+                        val userSession: UserSession? = call.sessions.get()
+                        if (userSession != null) {
+                            usersToRoom.assignUserToRoom(userSession.user, room)
+                        }
+                    }
 
                     call.response.headers.append("HX-Replace-Url", "/rooms/$roomName")
                     call.respondText(createHTML().div { insertSseFragment(room) }, contentType = ContentType.Text.Html)

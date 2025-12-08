@@ -1,5 +1,6 @@
 package ca.hendriks.planningpoker.html
 
+import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
 import kotlinx.html.InputType
 import kotlinx.html.button
@@ -10,13 +11,17 @@ import kotlinx.html.id
 import kotlinx.html.input
 import kotlinx.html.label
 
-fun FlowContent.insertJoinRoomForm() =
+fun FlowContent.insertJoinRoomForm(user: User?) =
     div {
         id = "room-form"
         classes = setOf("mx-auto w-full")
 
         form {
-            attributes["hx-get"] = "/rooms/{room-name}?user-name={user-name}"
+            if (user == null) {
+                attributes["hx-get"] = "/rooms/{room-name}?user-name={user-name}"
+            } else {
+                attributes["hx-get"] = "/rooms/{room-name}"
+            }
             attributes["hx-ext"] = "path-params"
             attributes["hx-target"] = "#room-form"
             attributes["hx-swap"] = "outerHTML"
@@ -46,25 +51,27 @@ fun FlowContent.insertJoinRoomForm() =
                     }
                 }
 
-                // User Name
-                div {
-                    classes = setOf("w-full px-3 sm:w-1/4")
+                if (user == null) {
+                    // User Name
+                    div {
+                        classes = setOf("w-full px-3 sm:w-1/4")
 
-                    label {
-                        classes = setOf("mb-3 block text-base font-medium text-[#07074D]")
+                        label {
+                            classes = setOf("mb-3 block text-base font-medium text-[#07074D]")
 
-                        htmlFor = "user-name"
-                        +"User Name"
-                    }
-                    input {
-                        classes =
-                            setOf("w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md")
+                            htmlFor = "user-name"
+                            +"User Name"
+                        }
+                        input {
+                            classes =
+                                setOf("w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md")
 
-                        type = InputType.text
-                        name = "user-name"
-                        id = "user-name"
-                        placeholder = "User Name"
-                        value = "Jason"
+                            type = InputType.text
+                            name = "user-name"
+                            id = "user-name"
+                            placeholder = "User Name"
+                            value = "Jason"
+                        }
                     }
                 }
 

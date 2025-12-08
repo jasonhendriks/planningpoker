@@ -31,7 +31,7 @@ fun HTML.renderIndex(room: Room? = null) {
         insertHeader()
         if (room == null) {
             div {
-                insertJoinRoomForm()
+                insertJoinRoomForm(null)
             }
         } else {
             insertSseFragment(room)
