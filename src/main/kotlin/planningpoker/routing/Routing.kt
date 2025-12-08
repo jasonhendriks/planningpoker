@@ -1,10 +1,10 @@
 package ca.hendriks.planningpoker.routing
 
 import ca.hendriks.planningpoker.UserToRoomRepository
+import ca.hendriks.planningpoker.html.insertJoinRoomForm
 import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.html.insertSseFragment
 import ca.hendriks.planningpoker.html.renderIndex
-import ca.hendriks.planningpoker.html.renderJoinRoomForm
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.user.User
@@ -16,20 +16,19 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.header
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import io.ktor.server.sessions.get
 import io.ktor.server.sessions.getOrSet
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
-import io.ktor.util.logging.debug
 import kotlinx.coroutines.delay
+import kotlinx.html.div
+import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
 import kotlin.uuid.ExperimentalUuidApi
 
-val LOBBY_PATH = "/lobby"
+val LOBBY_PATH = "/"
 
 @OptIn(ExperimentalUuidApi::class)
 fun Application.configureRouting() {
@@ -40,23 +39,26 @@ fun Application.configureRouting() {
     roomRepository.createRoom("Charlie")
 
     routing {
-        get("/") {
-            call.respondHtml {
-                renderIndex()
+        route(LOBBY_PATH) {
+            header("HX-Request", "true") {
+                get(LOBBY_PATH) {
+                    logger.info { "HTMX -> Back to Lobby" }
+                    val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+                    usersToRoom.unassignUser(userSession.user)
+                    call.respondText(createHTML().div { insertJoinRoomForm() }, contentType = ContentType.Text.Html)
+                }
             }
-        }
-
-        get(LOBBY_PATH) {
-            logger.info { "List rooms" }
-            val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-            usersToRoom.unassignUser(userSession.user)
-            call.respondHtml {
-                renderJoinRoomForm()
+            get(LOBBY_PATH) {
+                call.respondHtml {
+                    logger.info { "Display homepage" }
+                    renderIndex()
+                }
             }
         }
 
         route("/rooms/{room-name}") {
             header("HX-Request", "true") {
+
                 get {
                     val roomName = call.parameters["room-name"]
                     val userName = call.parameters["user-name"]
@@ -78,24 +80,7 @@ fun Application.configureRouting() {
                     logger.debug("Set $userName into the session")
 
                     call.response.headers.append("HX-Replace-Url", "/rooms/$roomName")
-                    call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
-                }
-
-                post {
-                    val roomName = call.parameters["room-name"]
-
-                    if (roomName == null) {
-                        call.respond(BadRequest, "room-name is required")
-                        return@post
-                    }
-
-                    val session = call.sessions.get<UserSession>()
-                    if (session != null) {
-                        logger.debug { "Found user ${session.user} in session" }
-                    }
-
-                    val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-                    call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
+                    call.respondText(createHTML().div { insertSseFragment(room) }, contentType = ContentType.Text.Html)
                 }
 
             }
@@ -120,7 +105,12 @@ fun Application.configureRouting() {
             try {
                 logger.info() { "Client connected to SSE" }
                 while (true) {
-                    send(ServerSentEvent(data = insertRoomFragment(room), event = eventName))
+                    send(
+                        ServerSentEvent(
+                            data = insertRoomFragment(room, usersToRoom.findUsersForRoom(room)),
+                            event = eventName
+                        )
+                    )
                     eventName = "keep-alive"
                     delay(1000)
                 }

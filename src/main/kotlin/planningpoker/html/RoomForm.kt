@@ -1,9 +1,7 @@
 package ca.hendriks.planningpoker.html
 
 import kotlinx.html.FlowContent
-import kotlinx.html.HTML
 import kotlinx.html.InputType
-import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.classes
 import kotlinx.html.div
@@ -12,21 +10,15 @@ import kotlinx.html.id
 import kotlinx.html.input
 import kotlinx.html.label
 
-fun HTML.renderJoinRoomForm() {
-    body {
-        insertJoinRoomForm()
-    }
-}
-
-fun FlowContent.insertJoinRoomForm() {
+fun FlowContent.insertJoinRoomForm() =
     div {
-        id = "room"
+        id = "room-form"
         classes = setOf("mx-auto w-full")
 
         form {
             attributes["hx-get"] = "/rooms/{room-name}?user-name={user-name}"
             attributes["hx-ext"] = "path-params"
-            attributes["hx-target"] = "#room"
+            attributes["hx-target"] = "#room-form"
             attributes["hx-swap"] = "outerHTML"
 
             div {
@@ -90,4 +82,3 @@ fun FlowContent.insertJoinRoomForm() {
             }
         }
     }
-}

@@ -2,17 +2,21 @@ package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Room
 import ca.hendriks.planningpoker.routing.LOBBY_PATH
+import ca.hendriks.planningpoker.user.User
+import kotlinx.html.FlowContent
 import kotlinx.html.button
 import kotlinx.html.classes
 import kotlinx.html.div
 import kotlinx.html.form
 import kotlinx.html.h1
 import kotlinx.html.id
+import kotlinx.html.li
 import kotlinx.html.stream.createHTML
+import kotlinx.html.ul
 
-fun insertSseFragment(room: Room) = createHTML()
-    .div {
-        id = "room"
+fun FlowContent.insertSseFragment(room: Room) =
+    div {
+        id = "room-sse"
         classes = setOf("mx-auto w-full")
         attributes["hx-ext"] = "sse"
         attributes["sse-connect"] = "/sse/sse-${room.name}"
@@ -20,7 +24,7 @@ fun insertSseFragment(room: Room) = createHTML()
         attributes["sse-swap"] = "update"
     }
 
-fun insertRoomFragment(room: Room) = createHTML()
+fun insertRoomFragment(room: Room, users: Collection<User>) = createHTML()
     .div {
 
         id = "room-${room.name}"
@@ -31,7 +35,7 @@ fun insertRoomFragment(room: Room) = createHTML()
 
         form {
             attributes["hx-get"] = LOBBY_PATH
-            attributes["hx-target"] = "#room"
+            attributes["hx-target"] = "#room-sse"
             attributes["hx-swap"] = "outerHTML"
 
             // Button
@@ -46,6 +50,15 @@ fun insertRoomFragment(room: Room) = createHTML()
                 }
             }
 
+            ul {
+                +"Users in this room:"
+
+                users.forEach { user ->
+                    li {
+                        +user.name
+                    }
+                }
+            }
         }
 
     }

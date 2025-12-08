@@ -19,4 +19,8 @@ class UserToRoomRepository {
         logger.info { "Unassigned user $user from room $room" }
     }
 
+    fun findUsersForRoom(room: Room): Collection<User> {
+        return mapping.filterValues { it == room }.keys
+    }
+
 }

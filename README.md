@@ -42,3 +42,18 @@ References:
 - [What is Hypermedia?](https://hypermedia.systems/introduction/)
 - [HTMX](https://htmx.org/)
 - 
+
+
+- URLs:
+- GET / - home page / lobby
+- GET /{room-name} - show homepage with room
+
+- HTMX API:
+- GET /rooms/{room-name}?user-name={user-name} - add current user to room / load room fragment
+- GET / - remove user from room / unload SSE room fragment
+
+- JSON API:
+- GET /rooms - list all rooms
+- GET /rooms/{room-name} - show details of specified room
+- GET /users - list all users
+- GET /users/{room-name} - show details of specified user

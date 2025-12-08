@@ -6,6 +6,7 @@ import kotlinx.html.FlowContent
 import kotlinx.html.HTML
 import kotlinx.html.body
 import kotlinx.html.classes
+import kotlinx.html.div
 import kotlinx.html.h5
 import kotlinx.html.head
 import kotlinx.html.script
@@ -29,7 +30,9 @@ fun HTML.renderIndex(room: Room? = null) {
     body {
         insertHeader()
         if (room == null) {
-            insertJoinRoomForm()
+            div {
+                insertJoinRoomForm()
+            }
         } else {
             insertSseFragment(room)
         }
