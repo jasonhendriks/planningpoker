@@ -1,14 +1,15 @@
 package ca.hendriks.planningpoker.routing
 
+import ca.hendriks.planningpoker.UserToRoomRepository
 import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.html.insertSseFragment
 import ca.hendriks.planningpoker.html.renderIndex
 import ca.hendriks.planningpoker.html.renderJoinRoomForm
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.room.RoomRepository
+import ca.hendriks.planningpoker.user.User
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
-import io.ktor.http.HttpStatusCode.Companion.Conflict
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.response.respond
@@ -19,18 +20,21 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
+import io.ktor.server.sessions.getOrSet
 import io.ktor.server.sessions.sessions
-import io.ktor.server.sessions.set
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
 import io.ktor.util.logging.debug
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 fun Application.configureRouting() {
 
     val logger = LoggerFactory.getLogger("Routing")
     val roomRepository = RoomRepository()
+    val usersToRoom = UserToRoomRepository()
     roomRepository.createRoom("Charlie")
 
     routing {
@@ -65,7 +69,7 @@ fun Application.configureRouting() {
 
                     val session = call.sessions.get<UserSession>()
                     if (session != null) {
-                        logger.debug { "Found user ${session.userName} in session" }
+                        logger.debug { "Found user ${session.user} in session" }
                     }
 
                     val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
@@ -101,14 +105,9 @@ fun Application.configureRouting() {
             }
 
             val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-            val user = room.addUser(userName)
-            if (user == null) {
-                logger.debug("User $userName is already in room $roomName")
-                call.respond(Conflict, "User $userName already exists in room $roomName")
-                return@post
-            }
-
-            call.sessions.set(UserSession(userName))
+            val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+            userSession.user.name = userName
+            usersToRoom.assignUserToRoom(userSession.user, room)
             logger.debug("Set $userName into the session")
 
             call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
