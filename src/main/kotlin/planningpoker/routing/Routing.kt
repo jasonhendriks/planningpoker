@@ -58,11 +58,29 @@ fun Application.configureRouting() {
         route("/rooms/{room-name}") {
             header("HX-Request", "true") {
                 get {
-                    logger.info { "Rendering room fragments" }
                     val roomName = call.parameters["room-name"]
-                    val charlie = roomRepository.findRoom(roomName!!)!!
-                    call.respondText(insertRoomFragment(charlie), contentType = ContentType.Text.Html)
+                    val userName = call.parameters["user-name"]
+
+                    if (roomName == null || roomName.trim().isEmpty()) {
+                        call.respond(BadRequest, "room-name is required")
+                        return@get
+                    }
+
+                    if (userName == null || userName.trim().isEmpty()) {
+                        call.respond(BadRequest, "user-name is required")
+                        return@get
+                    }
+
+                    val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
+                    val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+                    usersToRoom.assignUserToRoom(userSession.user, room)
+                    userSession.user.name = userName
+                    logger.debug("Set $userName into the session")
+
+                    call.response.headers.append("HX-Replace-Url", "/rooms/$roomName")
+                    call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
                 }
+
                 post {
                     val roomName = call.parameters["room-name"]
 
@@ -92,29 +110,6 @@ fun Application.configureRouting() {
                     renderIndex(charlie)
                 }
             }
-        }
-
-        post("/rooms/{room-name}/users/{user-name}") {
-            val roomName = call.parameters["room-name"]
-            val userName = call.parameters["user-name"]
-
-            if (roomName == null || roomName.trim().isEmpty()) {
-                call.respond(BadRequest, "room-name is required")
-                return@post
-            }
-
-            if (userName == null || userName.trim().isEmpty()) {
-                call.respond(BadRequest, "user-name is required")
-                return@post
-            }
-
-            val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-            val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-            usersToRoom.assignUserToRoom(userSession.user, room)
-            userSession.user.name = userName
-            logger.debug("Set $userName into the session")
-
-            call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
         }
 
         sse("/sse/sse-{room-name}") {
