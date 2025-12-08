@@ -1,9 +1,9 @@
 package ca.hendriks.planningpoker.routing
 
 import ca.hendriks.planningpoker.html.insertRoomFragment
+import ca.hendriks.planningpoker.html.insertSseFragment
 import ca.hendriks.planningpoker.html.renderIndex
 import ca.hendriks.planningpoker.html.renderJoinRoomForm
-import ca.hendriks.planningpoker.html.renderSse
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.room.RoomRepository
 import io.ktor.http.ContentType
@@ -21,7 +21,10 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
+import io.ktor.server.sse.sse
+import io.ktor.sse.ServerSentEvent
 import io.ktor.util.logging.debug
+import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 
 fun Application.configureRouting() {
@@ -66,9 +69,7 @@ fun Application.configureRouting() {
                     }
 
                     val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-                    call.respondHtml {
-                        renderSse(room)
-                    }
+                    call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
                 }
 
             }
@@ -110,8 +111,24 @@ fun Application.configureRouting() {
             call.sessions.set(UserSession(userName))
             logger.debug("Set $userName into the session")
 
-            call.respondHtml {
-                renderSse(room)
+            call.respondText(insertSseFragment(room), contentType = ContentType.Text.Html)
+        }
+
+        sse("/sse/sse-{room-name}") {
+            val roomName = call.parameters["room-name"]
+            val room = roomRepository.findRoom(roomName!!)!!
+            SseSessionManager.registerSession(this)
+            var eventName = "update"
+            try {
+                logger.info() { "Client connected to SSE" }
+                while (true) {
+                    send(ServerSentEvent(data = insertRoomFragment(room), event = eventName))
+                    eventName = "keep-alive"
+                    delay(1000)
+                }
+            } finally {
+                logger.info() { "Client disconnected from SSE" }
+                SseSessionManager.removeSession(this)
             }
         }
 

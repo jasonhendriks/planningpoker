@@ -1,7 +1,15 @@
 package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Room
-import kotlinx.html.*
+import kotlinx.html.BODY
+import kotlinx.html.FlowContent
+import kotlinx.html.HTML
+import kotlinx.html.body
+import kotlinx.html.classes
+import kotlinx.html.h5
+import kotlinx.html.head
+import kotlinx.html.script
+import kotlinx.html.unsafe
 
 fun HTML.renderIndex(room: Room? = null) {
     head {
@@ -23,7 +31,7 @@ fun HTML.renderIndex(room: Room? = null) {
         if (room == null) {
             insertJoinRoomForm()
         } else {
-            insertSse(room)
+            insertSseFragment(room)
         }
         insertErrorHandlingScripts()
     }
