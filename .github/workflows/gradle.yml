@@ -24,6 +24,6 @@ jobs:
       - name: Set up JDK 21
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 'latest'
+          gradle-version: '9.1.0'
       - name: Build with Gradle
         run: .gradlew build
