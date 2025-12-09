@@ -1,8 +1,6 @@
 package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Assignment
-import ca.hendriks.planningpoker.Room
-import ca.hendriks.planningpoker.routing.LOBBY_PATH
 import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
 import kotlinx.html.button
@@ -22,22 +20,22 @@ fun FlowContent.insertSseFragment(assignment: Assignment) =
         id = "room-sse"
         classes = setOf("mx-auto w-full")
         attributes["hx-ext"] = "sse"
-        attributes["sse-connect"] = "/sse/assignments/${assignment.id}"
+        attributes["sse-connect"] = "/assignments/${assignment.id}/sse"
         attributes["hx-push-url"] = "true"
         attributes["sse-swap"] = "update"
     }
 
-fun insertRoomFragment(room: Room, users: Collection<User>) = createHTML()
+fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = createHTML()
     .div {
 
         id = "room"
 
         h1 {
-            +"Welcome to room ${room.name}"
+            +"Welcome to room ${assignment.room.name}"
         }
 
         form {
-            attributes["hx-get"] = LOBBY_PATH
+            attributes["hx-delete"] = "/assignments/${assignment.id}"
             attributes["hx-target"] = "#room-sse"
             attributes["hx-swap"] = "outerHTML"
 

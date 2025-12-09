@@ -16,6 +16,7 @@ import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.RoutingCall
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.header
 import io.ktor.server.routing.post
@@ -43,21 +44,24 @@ fun Application.configureRouting() {
 
     routing {
         staticResources("/css", "web")
+        staticResources("/script", "web")
+
         route(LOBBY_PATH) {
             header("HX-Request", "true") {
-                get(LOBBY_PATH) {
+                delete("/assignments/{id}") {
                     logger.info { "HTMX -> Back to Lobby" }
-                    val userSession: UserSession? = call.sessions.get()
-                    val user = userSession?.user
-                    if (user != null) {
-                        val room = usersToRoom.findAssignment(user)?.room!!
-                        usersToRoom.unassignUser(user)
-                        SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
-                    }
-                    call.respondText(createHTML().div { insertJoinRoomForm(user) }, contentType = ContentType.Text.Html)
+                    val assignmentId = call.parameters["id"]!!
+                    val assignment = usersToRoom.findAssignment(assignmentId)
+                    usersToRoom.unassign(assignmentId)
+                    val room = assignment?.room!!
+                    SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
+                    call.respondText(
+                        createHTML().div { insertJoinRoomForm(assignment.user) },
+                        contentType = ContentType.Text.Html
+                    )
                 }
             }
-            get(LOBBY_PATH) {
+            get {
                 call.respondHtml {
                     logger.info { "Display homepage" }
                     val userSession: UserSession? = call.sessions.get()
@@ -67,8 +71,8 @@ fun Application.configureRouting() {
             }
         }
 
-        route("/assignments/{room-name}") {
-            header("HX-Request", "true") {
+        header("HX-Request", "true") {
+            route("/assignments/room/{room-name}") {
 
                 post {
                     val roomName = call.parameters["room-name"]
@@ -98,20 +102,18 @@ fun Application.configureRouting() {
             get {
                 logger.info { "Rendering room" }
                 call.respondHtml {
-                    val roomName = call.parameters["room-name"]
-                    val charlie = roomRepository.findRoom(roomName!!)!!
                     renderIndex()
                 }
             }
         }
 
-        sse("/sse/assignments/{id}") {
+        sse("/assignments/{id}/sse") {
             val assignmentId = call.parameters["id"]!!
             val assignment = usersToRoom.findAssignment(assignmentId)
             require(assignment != null) { "Assignment not found for id $assignmentId" }
             val room = assignment.room
             SseSessionManager.registerSession(this)
-            SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
+            SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
             try {
                 logger.info { "Client connected to SSE" }
                 while (true) {
@@ -127,7 +129,7 @@ fun Application.configureRouting() {
                 logger.info { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(this)
                 usersToRoom.unassign(assignmentId)
-                SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
+                SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
             }
         }
 

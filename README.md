@@ -45,12 +45,13 @@ References:
 
 
 - URLs:
-- GET / - home page / lobby
-- GET /{room-name} - show homepage with room
+- GET / - home page/lobby
+- GET /rooms/{room-name} - show homepage with room
 
 - HTMX API:
-- POST /assignment/{room-name}?user-name={user-name} - assign current user to room / return SSE room fragment
-- DELETE /assignment/{id} - remove current user from room / return lobby fragment
+- POST /assignment/room/{room-name}?user-name={user-name} - assign current user to room / return SSE room fragment
+- GET /assignments/{id}/sse - connect to SSE stream for current user / return SSE stream
+- DELETE /assignments/{id} - remove current user from room / return lobby fragment
 
 - JSON API:
 - GET /rooms - list all rooms

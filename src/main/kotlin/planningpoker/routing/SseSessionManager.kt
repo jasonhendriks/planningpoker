@@ -1,6 +1,6 @@
 package ca.hendriks.planningpoker.routing
 
-import ca.hendriks.planningpoker.Room
+import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.user.User
@@ -27,8 +27,8 @@ object SseSessionManager {
         sessions.remove(session)
     }
 
-    suspend fun broadcastUpdate(room: Room, users: Collection<User>) {
-        broadcastUpdate(insertRoomFragment(room, users))
+    suspend fun broadcastUpdate(assignment: Assignment, users: Collection<User>) {
+        broadcastUpdate(insertRoomFragment(assignment, users))
     }
 
     suspend fun broadcastUpdate(data: String) {

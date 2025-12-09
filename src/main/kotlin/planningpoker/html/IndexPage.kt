@@ -2,7 +2,6 @@ package ca.hendriks.planningpoker.html
 
 import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.user.User
-import kotlinx.html.BODY
 import kotlinx.html.FlowContent
 import kotlinx.html.HTML
 import kotlinx.html.body
@@ -12,7 +11,6 @@ import kotlinx.html.h5
 import kotlinx.html.head
 import kotlinx.html.link
 import kotlinx.html.script
-import kotlinx.html.unsafe
 
 fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
     head {
@@ -42,7 +40,9 @@ fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
         } else {
             insertSseFragment(assignment)
         }
-        insertErrorHandlingScripts()
+        script {
+            src = "/script/error-handling.js"
+        }
     }
 }
 
@@ -52,21 +52,5 @@ private fun FlowContent.insertHeader() {
             setOf("py-8 block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900")
 
         +"Planning Poker"
-    }
-}
-
-private fun BODY.insertErrorHandlingScripts() {
-    script {
-        unsafe {
-            +"""
-            document.body.addEventListener('htmx:responseError', function(evt) {
-              alert(evt.detail.xhr.responseText);
-            });
-            
-            document.body.addEventListener('htmx:sendError', function(evt) {
-              alert('Server unavailable!');
-            });
-        """.trimIndent()
-        }
     }
 }
