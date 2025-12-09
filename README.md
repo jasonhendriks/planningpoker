@@ -49,11 +49,13 @@ References:
 - GET /{room-name} - show homepage with room
 
 - HTMX API:
-- GET /rooms/{room-name}?user-name={user-name} - add current user to room / load room fragment
-- GET / - remove user from room / unload SSE room fragment
+- POST /assignment/{room-name}?user-name={user-name} - assign current user to room / return SSE room fragment
+- DELETE /assignment/{id} - remove current user from room / return lobby fragment
 
 - JSON API:
 - GET /rooms - list all rooms
 - GET /rooms/{room-name} - show details of specified room
 - GET /users - list all users
 - GET /users/{room-name} - show details of specified user
+- GET /assignments/ - list all users
+- GET /assignments/{id} - list particular User-to-Room assignment

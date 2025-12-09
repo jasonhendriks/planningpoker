@@ -1,6 +1,9 @@
 package ca.hendriks.planningpoker.routing
 
+import ca.hendriks.planningpoker.Room
+import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.info
+import ca.hendriks.planningpoker.user.User
 import io.ktor.server.sse.ServerSSESession
 import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.sync.Mutex
@@ -24,12 +27,16 @@ object SseSessionManager {
         sessions.remove(session)
     }
 
-    suspend fun broadcastDbUpdate(data: String) {
+    suspend fun broadcastUpdate(room: Room, users: Collection<User>) {
+        broadcastUpdate(insertRoomFragment(room, users))
+    }
+
+    suspend fun broadcastUpdate(data: String) {
         mutex.withLock {
             // Send the data to all active sessions
             for (session in sessions) {
                 try {
-                    session.send(ServerSentEvent(data))
+                    session.send(ServerSentEvent(data, "update"))
                 } catch (e: Exception) {
                     // Handle broken connections
                     logger.info { "Client disconnected from SSE: ${e.message}" }

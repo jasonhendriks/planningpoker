@@ -1,5 +1,6 @@
 package ca.hendriks.planningpoker.html
 
+import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.Room
 import ca.hendriks.planningpoker.routing.LOBBY_PATH
 import ca.hendriks.planningpoker.user.User
@@ -14,12 +15,12 @@ import kotlinx.html.li
 import kotlinx.html.stream.createHTML
 import kotlinx.html.ul
 
-fun FlowContent.insertSseFragment(room: Room) =
+fun FlowContent.insertSseFragment(assignment: Assignment) =
     div {
         id = "room-sse"
         classes = setOf("mx-auto w-full")
         attributes["hx-ext"] = "sse"
-        attributes["sse-connect"] = "/sse/sse-${room.name}"
+        attributes["sse-connect"] = "/sse/assignments/${assignment.id}"
         attributes["hx-push-url"] = "true"
         attributes["sse-swap"] = "update"
     }

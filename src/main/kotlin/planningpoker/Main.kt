@@ -5,6 +5,7 @@ import ca.hendriks.planningpoker.routing.configureRouting
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
+import io.ktor.server.sessions.SessionStorageMemory
 import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
 import io.ktor.server.sse.SSE
@@ -20,7 +21,7 @@ fun Application.module() {
     }
     install(SSE)
     install(Sessions) {
-        cookie<UserSession>("user_session")
+        cookie<UserSession>("user_session", SessionStorageMemory())
     }
     configureRouting()
 }

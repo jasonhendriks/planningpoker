@@ -18,9 +18,9 @@ fun FlowContent.insertJoinRoomForm(user: User?) =
 
         form {
             if (user == null) {
-                attributes["hx-get"] = "/rooms/{room-name}?user-name={user-name}"
+                attributes["hx-post"] = "/assignments/{room-name}?user-name={user-name}"
             } else {
-                attributes["hx-get"] = "/rooms/{room-name}"
+                attributes["hx-post"] = "/assignments/{room-name}"
             }
             attributes["hx-ext"] = "path-params"
             attributes["hx-target"] = "#room-form"

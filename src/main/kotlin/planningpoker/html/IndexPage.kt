@@ -1,6 +1,8 @@
 package ca.hendriks.planningpoker.html
 
+import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.Room
+import ca.hendriks.planningpoker.user.User
 import kotlinx.html.BODY
 import kotlinx.html.FlowContent
 import kotlinx.html.HTML
@@ -12,7 +14,7 @@ import kotlinx.html.head
 import kotlinx.html.script
 import kotlinx.html.unsafe
 
-fun HTML.renderIndex(room: Room? = null) {
+fun HTML.renderIndex(room: Room? = null, user: User? = null, assignment: Assignment? = null) {
     head {
         script {
             src = "https://unpkg.com/htmx.org@1.9.10"
@@ -29,12 +31,12 @@ fun HTML.renderIndex(room: Room? = null) {
     }
     body {
         insertHeader()
-        if (room == null) {
+        if (assignment == null) {
             div {
-                insertJoinRoomForm(null)
+                insertJoinRoomForm(user)
             }
         } else {
-            insertSseFragment(room)
+            insertSseFragment(assignment)
         }
         insertErrorHandlingScripts()
     }

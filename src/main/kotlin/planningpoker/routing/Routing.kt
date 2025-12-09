@@ -1,8 +1,8 @@
 package ca.hendriks.planningpoker.routing
 
-import ca.hendriks.planningpoker.UserToRoomRepository
+import ca.hendriks.planningpoker.AssignmentRepository
+import ca.hendriks.planningpoker.debug
 import ca.hendriks.planningpoker.html.insertJoinRoomForm
-import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.html.insertSseFragment
 import ca.hendriks.planningpoker.html.renderIndex
 import ca.hendriks.planningpoker.info
@@ -14,8 +14,10 @@ import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.get
 import io.ktor.server.routing.header
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
@@ -29,14 +31,13 @@ import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
 import kotlin.uuid.ExperimentalUuidApi
 
-val LOBBY_PATH = "/"
+const val LOBBY_PATH = "/"
 
-@OptIn(ExperimentalUuidApi::class)
 fun Application.configureRouting() {
 
     val logger = LoggerFactory.getLogger("Routing")
     val roomRepository = RoomRepository()
-    val usersToRoom = UserToRoomRepository()
+    val usersToRoom = AssignmentRepository()
     roomRepository.createRoom("Charlie")
 
     routing {
@@ -47,7 +48,9 @@ fun Application.configureRouting() {
                     val userSession: UserSession? = call.sessions.get()
                     val user = userSession?.user
                     if (user != null) {
+                        val room = usersToRoom.findAssignment(user)?.room!!
                         usersToRoom.unassignUser(user)
+                        SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
                     }
                     call.respondText(createHTML().div { insertJoinRoomForm(user) }, contentType = ContentType.Text.Html)
                 }
@@ -55,38 +58,35 @@ fun Application.configureRouting() {
             get(LOBBY_PATH) {
                 call.respondHtml {
                     logger.info { "Display homepage" }
-                    renderIndex()
+                    val userSession: UserSession? = call.sessions.get()
+                    val assignment = usersToRoom.findAssignment(user = userSession?.user)
+                    renderIndex(user = userSession?.user, assignment = assignment)
                 }
             }
         }
 
-        route("/rooms/{room-name}") {
+        route("/assignments/{room-name}") {
             header("HX-Request", "true") {
 
-                get {
+                post {
                     val roomName = call.parameters["room-name"]
                     val userName = call.parameters["user-name"]
 
                     if (roomName == null || roomName.trim().isEmpty()) {
                         call.respond(BadRequest, "room-name is required")
-                        return@get
+                        return@post
                     }
                     val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
 
-                    if (userName != null && !userName.trim().isEmpty()) {
-                        val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
-                        usersToRoom.assignUserToRoom(userSession.user, room)
-                        userSession.user.name = userName
-                        logger.debug("Set $userName into the session")
-                    } else {
-                        val userSession: UserSession? = call.sessions.get()
-                        if (userSession != null) {
-                            usersToRoom.assignUserToRoom(userSession.user, room)
-                        }
-                    }
+                    val user = findUserOrCreateUser(call, userName)
+                    logger.debug { "Found/Created $user in the session" }
+                    val assignment = usersToRoom.assignUserToRoom(user, room)
 
                     call.response.headers.append("HX-Replace-Url", "/rooms/$roomName")
-                    call.respondText(createHTML().div { insertSseFragment(room) }, contentType = ContentType.Text.Html)
+                    call.respondText(
+                        createHTML().div { insertSseFragment(assignment) },
+                        contentType = ContentType.Text.Html
+                    )
                 }
 
             }
@@ -103,28 +103,45 @@ fun Application.configureRouting() {
             }
         }
 
-        sse("/sse/sse-{room-name}") {
-            val roomName = call.parameters["room-name"]
-            val room = roomRepository.findRoom(roomName!!)!!
+        sse("/sse/assignments/{id}") {
+            val assignmentId = call.parameters["id"]!!
+            val assignment = usersToRoom.findAssignment(assignmentId)
+            require(assignment != null) { "Assignment not found for id $assignmentId" }
+            val room = assignment.room
             SseSessionManager.registerSession(this)
-            var eventName = "update"
+            SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
             try {
-                logger.info() { "Client connected to SSE" }
+                logger.info { "Client connected to SSE" }
                 while (true) {
                     send(
                         ServerSentEvent(
-                            data = insertRoomFragment(room, usersToRoom.findUsersForRoom(room)),
-                            event = eventName
+                            "",
+                            event = "keep-alive"
                         )
                     )
-                    eventName = "keep-alive"
                     delay(1000)
                 }
             } finally {
-                logger.info() { "Client disconnected from SSE" }
+                logger.info { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(this)
+                usersToRoom.unassign(assignmentId)
+                SseSessionManager.broadcastUpdate(room, usersToRoom.findUsersForRoom(room))
             }
         }
 
+    }
+
+}
+
+@OptIn(ExperimentalUuidApi::class)
+private fun findUserOrCreateUser(call: RoutingCall, userName: String?): User {
+    if (userName != null && !userName.trim().isEmpty()) {
+        val userSession = call.sessions.getOrSet<UserSession> { UserSession(User()) }
+        userSession.user.name = userName
+        return userSession.user
+    } else {
+        val userSession: UserSession? = call.sessions.get()
+        require(userSession?.user != null) { "User not found in session" }
+        return userSession.user
     }
 }
