@@ -12,6 +12,8 @@ import kotlinx.html.form
 import kotlinx.html.h1
 import kotlinx.html.id
 import kotlinx.html.li
+import kotlinx.html.p
+import kotlinx.html.span
 import kotlinx.html.stream.createHTML
 import kotlinx.html.ul
 
@@ -28,7 +30,7 @@ fun FlowContent.insertSseFragment(assignment: Assignment) =
 fun insertRoomFragment(room: Room, users: Collection<User>) = createHTML()
     .div {
 
-        id = "room-${room.name}"
+        id = "room"
 
         h1 {
             +"Welcome to room ${room.name}"
@@ -51,15 +53,39 @@ fun insertRoomFragment(room: Room, users: Collection<User>) = createHTML()
                 }
             }
 
-            ul {
-                +"Users in this room:"
+        }
 
-                users.forEach { user ->
-                    li {
-                        +user.name
+        div {
+
+            id = "poker-table"
+
+            p {
+                ul {
+                    +"Users in this room:"
+
+                    users.forEach { user ->
+                        li {
+                            +user.name
+                        }
                     }
                 }
             }
+
+            div {
+                id = "selectable-cards"
+                for (i in 1..5) {
+                    div {
+                        classes = setOf("card")
+                        div {
+                            classes = setOf("corner top-left")
+                            span {
+                                +"$i"
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
     }

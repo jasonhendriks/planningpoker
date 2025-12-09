@@ -1,0 +1,61 @@
+#room {
+    background-color: #339900; /* Poker table green */
+}
+
+#poker-table {
+    display: flex;
+    justify-content: center; /* Center the hand on the page */
+    align-items: center;
+    height: 50vh;
+    margin: 0;
+}
+
+#selectable-cards {
+    display: flex;
+    gap: 15px; /* Adds space between the cards */
+    flex-wrap: wrap; /* Allows cards to wrap to the next line if the screen is too narrow */
+    justify-content: center;
+}
+
+.card {
+  width: 4em;
+  height: 6em;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+  /* Deeper shadow on hover */
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  transform: translateY(-3px);
+}
+
+.corner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2em;
+  line-height: 1;
+}
+
+.top-left {
+  align-self: flex-start;
+}
+
+.bottom-right {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.suit-center {
+  font-size: 80px;
+  line-height: 1;
+}

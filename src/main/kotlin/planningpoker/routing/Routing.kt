@@ -12,6 +12,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.RoutingCall
@@ -41,6 +42,7 @@ fun Application.configureRouting() {
     roomRepository.createRoom("Charlie")
 
     routing {
+        staticResources("/css", "web")
         route(LOBBY_PATH) {
             header("HX-Request", "true") {
                 get(LOBBY_PATH) {
@@ -98,7 +100,7 @@ fun Application.configureRouting() {
                 call.respondHtml {
                     val roomName = call.parameters["room-name"]
                     val charlie = roomRepository.findRoom(roomName!!)!!
-                    renderIndex(charlie)
+                    renderIndex()
                 }
             }
         }
