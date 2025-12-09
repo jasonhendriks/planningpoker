@@ -26,4 +26,4 @@ jobs:
         with:
           gradle-version: '9.1.0'
       - name: Build with Gradle
-        run: .gradlew build
+        run: ./gradlew build
