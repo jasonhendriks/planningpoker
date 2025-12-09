@@ -81,5 +81,5 @@ dependencies {
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
     intTestImplementation("io.cucumber:cucumber-junit-platform-engine:7.15.0")
     intTestImplementation("org.junit.platform:junit-platform-suite")
-    intTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    intTestImplementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
 }
