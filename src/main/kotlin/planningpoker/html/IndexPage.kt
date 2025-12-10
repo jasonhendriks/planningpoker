@@ -19,13 +19,13 @@ fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
             href = "/css/style.css"
         }
         script {
-            src = "https://unpkg.com/htmx.org@1.9.10"
+            src = "/assets/htmx.org/2.0.8/dist/htmx.min.js"
         }
         script {
-            src = "https://unpkg.com/htmx.org/dist/ext/path-params.js"
+            src = "/assets/htmx-ext-path-params/2.0.0/path-params.js"
         }
         script {
-            src = "https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"
+            src = "/assets/htmx-ext-sse/2.2.4/dist/sse.min.js"
         }
         script {
             src = "https://unpkg.com/@tailwindcss/browser@4"
