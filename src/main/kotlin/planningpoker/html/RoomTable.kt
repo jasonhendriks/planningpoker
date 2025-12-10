@@ -71,13 +71,14 @@ fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = create
 
             div {
                 id = "selectable-cards"
-                for (i in 1..5) {
+                val cards = listOf("1", "2", "3", "5", "8")
+                cards.forEach {
                     div {
                         classes = setOf("card")
                         div {
                             classes = setOf("corner top-left")
                             span {
-                                +"$i"
+                                +"$it"
                             }
                         }
                     }
