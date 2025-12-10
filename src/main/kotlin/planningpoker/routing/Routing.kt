@@ -52,11 +52,14 @@ fun Application.configureRouting() {
                     logger.info { "HTMX -> Back to Lobby" }
                     val assignmentId = call.parameters["id"]!!
                     val assignment = usersToRoom.findAssignment(assignmentId)
-                    usersToRoom.unassign(assignmentId)
-                    val room = assignment?.room!!
-                    SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
+                    if (assignment != null) {
+                        usersToRoom.unassign(assignmentId)
+                        val room = assignment.room!!
+                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
+                    }
+                    val userSession: UserSession? = call.sessions.get()
                     call.respondText(
-                        createHTML().div { insertJoinRoomForm(assignment.user) },
+                        createHTML().div { insertJoinRoomForm(userSession?.user) },
                         contentType = ContentType.Text.Html
                     )
                 }
