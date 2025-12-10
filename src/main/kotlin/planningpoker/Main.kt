@@ -12,7 +12,7 @@ import io.ktor.server.sse.SSE
 import io.ktor.server.webjars.Webjars
 
 fun main(args: Array<String>) {
-    val externalPort = System.getProperty("server.port", "8888").toInt()
+    val externalPort = System.getProperty("server.port", "8080").toInt()
     embeddedServer(Netty, port = externalPort) {
         install(Webjars) {
             path = "assets"
