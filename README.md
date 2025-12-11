@@ -1,62 +1,107 @@
-# planningpoker
+# Planning Poker
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+A Hypermedia-Driven Application built with Kotlin, HTMX, and Ktor SSE.
 
-Here are some useful links to get you started:
+Try it out online: https://planningpoker.hendriks.ca/
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## Requirements
 
-## Features
+- [JDK v21](https://openjdk.org/projects/jdk/21/)
+- [Git](https://www.atlassian.com/git/tutorials/install-git)
+- [Gradle 9](https://gradle.org)
+- [Optional] [Heroku CLI client](https://devcenter.heroku.com/articles/heroku-cli)
 
-Here's a list of features included in this project:
+## Installation
 
-| Name                                               | Description                                                 |
-| ----------------------------------------------------|------------------------------------------------------------- |
-| [Routing](https://start.ktor.io/p/routing-default) | Allows to define structured routes and associated handlers. |
+1. Download the [source code](https://github.com/jasonhendriks/planningpoker) to your workstation
+    ```
+    git clone https://github.com/jasonhendriks/planningpoker
+    ```
+3. [Optional] If you installed the Heroku CLI, connect your local repository to Heroku:
+    ```
+    heroku git:remote --app planningpoker
+    ```
 
-## Building & Running
+## Running Locally
 
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-| -----------------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
+### Build the application and run with the Maven Spring Boot plug-in
 
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+$ ./gradlew build
 ```
 
-References:
+Then access the application in your web browser: http://localhost:8080
+
+### Build the application and run with the Heroku CLI
+
+```
+$ ./gradlew build
+$ heroku local
+```
+
+Then access the application in your web browser: http://localhost:5001
+
+## Deployment to Production
+
+### Continuous Integration
+
+After committing and pushing any changes, GitHub will run the tests. If successful, Heroku will automatically retrieve
+the changes, build and deploy.
+
+### Manual Deploy with Heroku CLI
+
+Push to the Heroku GIT remote to manually trigger a deployment:
+
+```
+git push heroku
+```
+
+## Production Support
+
+### Debugging
+
+View the production logs:
+
+```
+heroku logs --tail --app planningpoker
+```
+
+## Development Resources
+
+HTMX
 
 - [What is Hypermedia?](https://hypermedia.systems/introduction/)
 - [HTMX](https://htmx.org/)
-- 
+- [You can do so much with hx-boost, hx-indicator, and simple forms / links @ Reddit](https://www.reddit.com/r/htmx/comments/196gwsa/you_can_do_so_much_with_hxboost_hxindicator_and/)
 
+Heroku
 
-- URLs:
-- GET / - home page/lobby
-- GET /rooms/{room-name} - show homepage with room
+- https://devcenter.heroku.com/articles/java-session-handling-on-heroku
 
-- HTMX API:
-- POST /assignment/room/{room-name}?user-name={user-name} - assign current user to room / return SSE room fragment
-- GET /assignments/{id}/sse - connect to SSE stream for current user / return SSE stream
-- DELETE /assignments/{id} - remove current user from room / return lobby fragment
+## Application Endpoints
 
-- JSON API:
-- GET /rooms - list all rooms
-- GET /rooms/{room-name} - show details of specified room
-- GET /users - list all users
-- GET /users/{room-name} - show details of specified user
-- GET /assignments/ - list all users
-- GET /assignments/{id} - list particular User-to-Room assignment
+### Web URLs:
+
+| Endpoint                 | Description             |
+|--------------------------|-------------------------|
+| `GET /`                  | home page/lobby         |
+| `GET /rooms/{room-name}` | show homepage with room |
+
+## HTMX API:
+
+| Endpoint                                                  | Description                                                |
+|-----------------------------------------------------------|------------------------------------------------------------|
+| `POST /assignment/room/{room-name}?user-name={user-name}` | assign current user to room / return SSE room fragment     |
+| `GET /assignments/{id}/sse`                               | connect to SSE stream for current user / return SSE stream |
+| `DELETE /assignments/{id}`                                | remove current user from room / return lobby fragment      |
+
+## JSON API:
+
+| Endpoint                 | Description                             |
+|--------------------------|-----------------------------------------|
+| `GET /rooms`             | list all rooms                          |
+| `GET /rooms/{room-name}` | show details of specified room          |
+| `GET /users`             | list all users                          |
+| `GET /users/{room-name}` | show details of specified user          |
+| `GET /assignments/`      | list all users                          |
+| `GET /assignments/{id}`  | list particular User-to-Room assignment |
