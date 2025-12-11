@@ -77,9 +77,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
     testImplementation("io.kotest:kotest-framework-datatest-jvm:5.7.2")
 
-    intTestImplementation("io.cucumber:cucumber-java8:7.15.0")
+    intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    intTestImplementation("io.cucumber:cucumber-junit-platform-engine:7.15.0")
     intTestImplementation("org.junit.platform:junit-platform-suite")
     intTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
 }

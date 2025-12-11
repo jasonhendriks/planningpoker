@@ -1,6 +1,6 @@
 # Planning Poker
 
-A Hypermedia-Driven Application built with Kotlin, HTMX, and Ktor SSE.
+A Hypermedia-driven Scrum Poker web application built with Kotlin, HTMX, and Ktor SSE.
 
 Try it out online: https://planningpoker.hendriks.ca/
 
@@ -82,18 +82,18 @@ Heroku
 
 ### Web URLs:
 
-| Endpoint                 | Description             |
-|--------------------------|-------------------------|
-| `GET /`                  | home page/lobby         |
-| `GET /rooms/{room-name}` | show homepage with room |
+| Endpoint                | Description             |
+|-------------------------|-------------------------|
+| `GET /`                 | home page/lobby         |
+| `GET /room/{room-name}` | show homepage with room |
 
 ## HTMX API:
 
-| Endpoint                                                  | Description                                                |
-|-----------------------------------------------------------|------------------------------------------------------------|
-| `POST /assignment/room/{room-name}?user-name={user-name}` | assign current user to room / return SSE room fragment     |
-| `GET /assignments/{id}/sse`                               | connect to SSE stream for current user / return SSE stream |
-| `DELETE /assignments/{id}`                                | remove current user from room / return lobby fragment      |
+| Endpoint                                                       | Description                                                |
+|----------------------------------------------------------------|------------------------------------------------------------|
+| `POST /assignment?room-name={room-name}&user-name={user-name}` | assign current user to room / return SSE room fragment     |
+| `GET /assignments/{id}/sse`                                    | connect to SSE stream for current user / return SSE stream |
+| `DELETE /assignments/{id}`                                     | remove current user from room / return lobby fragment      |
 
 ## JSON API:
 
