@@ -6,6 +6,12 @@ class RoomRepository {
 
     val rooms = mutableMapOf<String, Room>()
 
+    fun findOrCreateRoom(name: String): Room {
+        return rooms.getOrElse(name) {
+            createRoom(name)
+        }
+    }
+
     fun findRoom(name: String): Room? {
         return rooms[name]
     }

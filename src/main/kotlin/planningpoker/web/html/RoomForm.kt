@@ -46,7 +46,6 @@ fun FlowContent.insertJoinRoomForm(user: User?) =
                         type = InputType.text
                         name = "room-name"
                         id = "room-name"
-                        placeholder = "Room Name"
                     }
                 }
 

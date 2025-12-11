@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
         install(Sessions) {
             cookie<UserSession>("user_session")
         }
-        configureRouting(usersToRoom)
+        configureRouting(roomRepository, usersToRoom)
         configureHtmxRouting(roomRepository, usersToRoom)
     }.start(wait = true)
 }

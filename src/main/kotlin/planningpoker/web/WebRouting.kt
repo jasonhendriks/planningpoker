@@ -2,12 +2,17 @@ package ca.hendriks.planningpoker.routing
 
 import ca.hendriks.planningpoker.AssignmentRepository
 import ca.hendriks.planningpoker.info
+import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.web.html.renderIndex
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -16,11 +21,14 @@ import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.delay
+import kotlinx.html.html
+import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
 
 const val LOBBY_PATH = "/"
 
 fun Application.configureRouting(
+    roomRepository: RoomRepository,
     usersToRoom: AssignmentRepository
 ) {
 
@@ -32,20 +40,39 @@ fun Application.configureRouting(
 
         route(LOBBY_PATH) {
             get {
-                call.respondHtml {
-                    logger.info { "Display homepage" }
-                    val userSession: UserSession? = call.sessions.get()
-                    val assignment = usersToRoom.findAssignment(user = userSession?.user)
-                    renderIndex(user = userSession?.user, assignment = assignment)
+                logger.info { "Display homepage" }
+                val userSession: UserSession? = call.sessions.get()
+                val assignment = usersToRoom.findAssignment(user = userSession?.user)
+                if (assignment != null) {
+                    usersToRoom.unassign(assignment.id)
                 }
+                call.respondText(
+                    createHTML().html { renderIndex(user = userSession?.user, assignment = assignment) },
+                    contentType = ContentType.Text.Html
+                )
             }
         }
 
         route("/room/{room-name}") {
             get {
-                logger.info { "Rendering room" }
-                call.respondHtml {
-                    renderIndex()
+                val roomName = call.parameters["room-name"]
+                if (roomName == null || roomName.trim().isEmpty()) {
+                    call.respond(BadRequest, "A Room Name is required")
+                    return@get
+                }
+                val userSession: UserSession? = call.sessions.get()
+                if (userSession?.user != null) {
+                    logger.info { "Rendering room with session user" }
+                    val room = roomRepository.findOrCreateRoom(roomName)
+                    val assignment = usersToRoom.assignUserToRoom(userSession.user, room)
+                    call.respondHtml {
+                        renderIndex(userSession.user, assignment)
+                    }
+                } else {
+                    logger.info { "Rendering room with no user" }
+                    call.respondHtml {
+                        renderIndex(userSession?.user)
+                    }
                 }
             }
         }

@@ -66,8 +66,7 @@ fun Application.configureHtmxRouting(
                         call.respond(BadRequest, "A Room Name is required")
                         return@post
                     }
-                    val room = roomRepository.findRoom(roomName) ?: roomRepository.createRoom(roomName)
-
+                    val room = roomRepository.findOrCreateRoom(roomName)
                     val user = findUserOrCreateUser(call, userName)
                     logger.debug { "Found/Created $user in the session" }
                     val assignment = usersToRoom.assignUserToRoom(user, room)

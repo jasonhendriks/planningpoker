@@ -5,11 +5,12 @@ import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
 import kotlinx.html.HTML
 import kotlinx.html.body
-import kotlinx.html.classes
 import kotlinx.html.div
-import kotlinx.html.h5
+import kotlinx.html.h3
 import kotlinx.html.head
+import kotlinx.html.hr
 import kotlinx.html.link
+import kotlinx.html.p
 import kotlinx.html.script
 
 fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
@@ -32,7 +33,7 @@ fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
         }
     }
     body {
-        insertHeader()
+        insertHeader(user)
         if (assignment == null) {
             div {
                 insertJoinRoomForm(user)
@@ -46,11 +47,15 @@ fun HTML.renderIndex(user: User? = null, assignment: Assignment? = null) {
     }
 }
 
-private fun FlowContent.insertHeader() {
-    h5 {
-        classes =
-            setOf("py-8 block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900")
-
+private fun FlowContent.insertHeader(user: User?) {
+    h3 {
         +"Planning Poker"
     }
+    if (user != null) {
+        p {
+            +"Welcome back, ${user.name}!"
+        }
+    }
+    hr { }
+
 }
