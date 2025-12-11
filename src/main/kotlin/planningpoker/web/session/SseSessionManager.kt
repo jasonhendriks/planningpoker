@@ -1,9 +1,9 @@
-package ca.hendriks.planningpoker.routing
+package ca.hendriks.planningpoker.routing.session
 
 import ca.hendriks.planningpoker.Assignment
-import ca.hendriks.planningpoker.html.insertRoomFragment
 import ca.hendriks.planningpoker.info
 import ca.hendriks.planningpoker.user.User
+import ca.hendriks.planningpoker.web.html.insertRoomFragment
 import io.ktor.server.sse.ServerSSESession
 import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.sync.Mutex

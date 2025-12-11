@@ -1,4 +1,4 @@
-package ca.hendriks.planningpoker.html
+package ca.hendriks.planningpoker.web.html
 
 import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.user.User
@@ -78,7 +78,7 @@ fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = create
                         div {
                             classes = setOf("corner top-left")
                             span {
-                                +"$it"
+                                +it
                             }
                         }
                     }

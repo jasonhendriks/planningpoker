@@ -1,4 +1,4 @@
-package ca.hendriks.planningpoker.html
+package ca.hendriks.planningpoker.web.html
 
 import ca.hendriks.planningpoker.Assignment
 import ca.hendriks.planningpoker.user.User

@@ -1,4 +1,4 @@
-package ca.hendriks.planningpoker.html
+package ca.hendriks.planningpoker.web.html
 
 import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
@@ -18,9 +18,9 @@ fun FlowContent.insertJoinRoomForm(user: User?) =
 
         form {
             if (user == null) {
-                attributes["hx-post"] = "/assignments/room/{room-name}?user-name={user-name}"
+                attributes["hx-post"] = "/assignments?room-name={room-name}&user-name={user-name}"
             } else {
-                attributes["hx-post"] = "/assignments/room/{room-name}"
+                attributes["hx-post"] = "/assignments?room-name={room-name}"
             }
             attributes["hx-ext"] = "path-params"
             attributes["hx-target"] = "#room-form"
@@ -47,7 +47,6 @@ fun FlowContent.insertJoinRoomForm(user: User?) =
                         name = "room-name"
                         id = "room-name"
                         placeholder = "Room Name"
-                        value = "Charlie"
                     }
                 }
 
@@ -70,7 +69,6 @@ fun FlowContent.insertJoinRoomForm(user: User?) =
                             name = "user-name"
                             id = "user-name"
                             placeholder = "User Name"
-                            value = "Jason"
                         }
                     }
                 }

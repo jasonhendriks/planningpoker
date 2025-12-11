@@ -29,20 +29,8 @@ class AssignmentRepository {
         mutex.withLock {
             val assignment = mappingsByUuid.remove(assignmentId)
             if (assignment != null) {
-                mappingsByUuid.remove(assignment.id)
+                mappingsByUser.remove(assignment.user)
                 logger.info { "Unassigned user ${assignment.user} from room ${assignment.room}" }
-            }
-        }
-    }
-
-    suspend fun unassignUser(user: User) {
-        mutex.withLock {
-            val assignment = mappingsByUser.remove(user)
-            if (assignment != null) {
-                mappingsByUuid.remove(assignment.id)
-                logger.info { "Unassigned user $user from room ${assignment.room}" }
-            } else {
-                logger.warn { "User $user not found in Assignment repository" }
             }
         }
     }
