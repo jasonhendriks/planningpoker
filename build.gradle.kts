@@ -76,6 +76,8 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
     testImplementation("io.kotest:kotest-framework-datatest-jvm:5.7.2")
+    intTestImplementation(ktorLibs.client.core)
+    intTestImplementation(ktorLibs.client.cio)
 
     intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
