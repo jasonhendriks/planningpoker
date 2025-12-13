@@ -1,8 +1,8 @@
 package ca.hendriks.planningpoker.routing.session
 
-import ca.hendriks.planningpoker.Assignment
-import ca.hendriks.planningpoker.info
+import ca.hendriks.planningpoker.assignment.Assignment
 import ca.hendriks.planningpoker.user.User
+import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.insertRoomFragment
 import io.ktor.server.sse.ServerSSESession
 import io.ktor.sse.ServerSentEvent
@@ -18,12 +18,12 @@ object SseSessionManager {
     private val mutex = Mutex()
 
     fun registerSession(session: ServerSSESession) {
-        logger.info { "Tracking new session: ${session.hashCode()}" }
+        logger.debug { "Tracking new session: ${session.hashCode()}" }
         sessions.add(session)
     }
 
     fun removeSession(session: ServerSSESession) {
-        logger.info { "Stopped tracking session: ${session.hashCode()}" }
+        logger.debug { "Stopped tracking session: ${session.hashCode()}" }
         sessions.remove(session)
     }
 
@@ -39,7 +39,7 @@ object SseSessionManager {
                     session.send(ServerSentEvent(data, "update"))
                 } catch (e: Exception) {
                     // Handle broken connections
-                    logger.info { "Client disconnected from SSE: ${e.message}" }
+                    logger.debug { "Client disconnected from SSE: ${e.message}" }
                     sessions.remove(session)
                 }
             }

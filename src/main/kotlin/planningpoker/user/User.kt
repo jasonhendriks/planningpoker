@@ -1,11 +1,11 @@
 package ca.hendriks.planningpoker.user
 
+import ca.hendriks.planningpoker.util.uuidSupplier
 import kotlinx.serialization.Serializable
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @Serializable
-data class User @OptIn(ExperimentalUuidApi::class) constructor(val id: String = Uuid.random().toString()) {
+data class User(val id: String = uuidSupplier().invoke()) {
+
     var name: String = ""
 
     override fun toString(): String {

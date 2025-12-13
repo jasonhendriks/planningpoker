@@ -1,6 +1,6 @@
-package ca.hendriks.planningpoker
+package ca.hendriks.planningpoker.util
 
-import ca.hendriks.planningpoker.LogLevel.*
+import ca.hendriks.planningpoker.util.LogLevel.*
 import org.slf4j.Logger
 
 enum class LogLevel { TRACE, DEBUG, INFO, WARN, ERROR }

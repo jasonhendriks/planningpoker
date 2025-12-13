@@ -1,10 +1,10 @@
 package ca.hendriks.planningpoker.routing
 
-import ca.hendriks.planningpoker.AssignmentRepository
-import ca.hendriks.planningpoker.info
+import ca.hendriks.planningpoker.assignment.AssignmentRepository
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
+import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
@@ -32,7 +32,7 @@ fun Application.configureRouting(
     usersToRoom: AssignmentRepository
 ) {
 
-    val logger = LoggerFactory.getLogger("Routing")
+    val logger = LoggerFactory.getLogger("WebRouting")
 
     routing {
         staticResources("/css", "web")
@@ -40,7 +40,7 @@ fun Application.configureRouting(
 
         route(LOBBY_PATH) {
             get {
-                logger.info { "Display homepage" }
+                logger.debug { "Display homepage" }
                 val userSession: UserSession? = call.sessions.get()
                 val assignment = usersToRoom.findAssignment(user = userSession?.user)
                 if (assignment != null) {
@@ -62,14 +62,14 @@ fun Application.configureRouting(
                 }
                 val userSession: UserSession? = call.sessions.get()
                 if (userSession?.user != null) {
-                    logger.info { "Rendering room with session user" }
+                    logger.debug { "Rendering room with session user" }
                     val room = roomRepository.findOrCreateRoom(roomName)
                     val assignment = usersToRoom.assignUserToRoom(userSession.user, room)
                     call.respondHtml {
                         renderIndex(userSession.user, assignment)
                     }
                 } else {
-                    logger.info { "Rendering room with no user" }
+                    logger.debug { "Rendering room with no user" }
                     call.respondHtml {
                         renderIndex(userSession?.user)
                     }
@@ -85,7 +85,7 @@ fun Application.configureRouting(
             SseSessionManager.registerSession(this)
             SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
             try {
-                logger.info { "Client connected to SSE" }
+                logger.debug { "Client connected to SSE" }
                 while (true) {
                     send(
                         ServerSentEvent(
@@ -96,7 +96,7 @@ fun Application.configureRouting(
                     delay(1000)
                 }
             } finally {
-                logger.info { "Client disconnected from SSE" }
+                logger.debug { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(this)
                 usersToRoom.unassign(assignmentId)
                 SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))

@@ -1,12 +1,12 @@
 package ca.hendriks.planningpoker.routing
 
-import ca.hendriks.planningpoker.AssignmentRepository
-import ca.hendriks.planningpoker.debug
-import ca.hendriks.planningpoker.info
+import ca.hendriks.planningpoker.assignment.AssignmentRepository
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.user.User
+import ca.hendriks.planningpoker.util.debug
+import ca.hendriks.planningpoker.util.info
 import ca.hendriks.planningpoker.web.html.insertJoinRoomForm
 import ca.hendriks.planningpoker.web.html.insertSseFragment
 import io.ktor.http.ContentType
@@ -33,7 +33,7 @@ fun Application.configureHtmxRouting(
     usersToRoom: AssignmentRepository
 ) {
 
-    val logger = LoggerFactory.getLogger("Routing")
+    val logger = LoggerFactory.getLogger("HtmxRouting")
 
     routing {
         header("HX-Request", "true") {

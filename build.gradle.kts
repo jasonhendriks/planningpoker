@@ -68,7 +68,6 @@ dependencies {
     implementation(ktorLibs.server.sse)
     implementation(ktorLibs.server.webjars)
     implementation(ktorLibs.server.htmlBuilder)
-
     implementation(libs.bundles.htmx)
     implementation(libs.logback.classic)
 
@@ -76,11 +75,11 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
     testImplementation("io.kotest:kotest-framework-datatest-jvm:5.7.2")
+
+    intTestImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
     intTestImplementation(ktorLibs.client.core)
     intTestImplementation(ktorLibs.client.cio)
-
     intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
-    intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
     intTestImplementation("org.junit.platform:junit-platform-suite")
-    intTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

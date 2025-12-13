@@ -1,9 +1,11 @@
 package ca.hendriks.planningpoker
 
+import ca.hendriks.planningpoker.assignment.AssignmentRepository
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.configureHtmxRouting
 import ca.hendriks.planningpoker.routing.configureRouting
 import ca.hendriks.planningpoker.routing.session.UserSession
+import ca.hendriks.planningpoker.util.debug
 import io.ktor.server.application.install
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
@@ -23,10 +25,10 @@ fun main(args: Array<String>) {
 }
 
 fun ktor(
-    externalPort: Int
+    externalPort: Int,
+    roomRepository: RoomRepository = RoomRepository(),
+    usersToRoom: AssignmentRepository = AssignmentRepository(),
 ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-    val roomRepository = RoomRepository()
-    val usersToRoom = AssignmentRepository()
 
     return embeddedServer(Netty, port = externalPort) {
         install(Webjars) {

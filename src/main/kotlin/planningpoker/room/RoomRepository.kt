@@ -1,7 +1,5 @@
 package ca.hendriks.planningpoker.room
 
-import ca.hendriks.planningpoker.Room
-
 class RoomRepository {
 
     val rooms = mutableMapOf<String, Room>()
@@ -12,7 +10,7 @@ class RoomRepository {
         }
     }
 
-    fun createRoom(name: String): Room {
+    private fun createRoom(name: String): Room {
         if (rooms.contains(name)) {
             throw IllegalArgumentException("Room with name $name already exists")
         }

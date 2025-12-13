@@ -1,6 +1,6 @@
 package ca.hendriks.planningpoker.web.html
 
-import ca.hendriks.planningpoker.Assignment
+import ca.hendriks.planningpoker.assignment.Assignment
 import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
 import kotlinx.html.HTML
