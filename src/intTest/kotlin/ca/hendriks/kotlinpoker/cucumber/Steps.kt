@@ -16,10 +16,14 @@ import kotlinx.coroutines.runBlocking
 
 class Steps {
 
+    companion object {
+        const val PORT = 8888
+    }
+
     @Given("my application")
     fun rootRouteRespondsWithHelloWorldString(): Unit = runBlocking {
         val response: String = HttpClient()
-            .get("http://localhost:8080/")
+            .get("http://localhost:$PORT/")
             .body()
         response shouldNotBe null
     }
@@ -34,7 +38,7 @@ class Steps {
         @BeforeAll
         @JvmStatic
         fun startServer() {
-            embeddedServer = ktor(8080, roomRepository, usersToRoom)
+            embeddedServer = ktor(PORT, roomRepository, usersToRoom)
                 .start()
         }
 

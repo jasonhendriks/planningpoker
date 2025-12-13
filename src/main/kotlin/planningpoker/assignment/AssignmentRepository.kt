@@ -14,11 +14,25 @@ class AssignmentRepository {
     private val mappingsByUser = mutableMapOf<User, Assignment>()
     private val mutex = Mutex()
 
+    fun findAssignment(assignmentId: String) = mappingsByUser.values.find { it.id == assignmentId }
+
+    fun findAssignment(user: User?): Assignment? = mappingsByUser[user]
+
+    fun findAssignments(room: Room): Collection<Assignment> =
+        mappingsByUser.filterValues { it.room == room }.values
+
+    fun findUsers(room: Room): Collection<User> {
+        return mappingsByUser.filterValues { it.room == room }.keys
+    }
+
     suspend fun assignUserToRoom(user: User, room: Room): Assignment {
         mutex.withLock {
             val existingAssignment = mappingsByUser[user]
             if (existingAssignment?.room == room) {
-                return existingAssignment
+                val assignment = Assignment(user, room, vote = existingAssignment.vote)
+                mappingsByUser[user] = assignment
+                logger.debug { "Re-Assigned user $user to $room with assignment ID ${assignment.id}" }
+                return assignment
             }
             val assignment = Assignment(user, room)
             mappingsByUser[user] = assignment
@@ -36,13 +50,5 @@ class AssignmentRepository {
             }
         }
     }
-
-    fun findUsersForRoom(room: Room): Collection<User> {
-        return mappingsByUser.filterValues { it.room == room }.keys
-    }
-
-    fun findAssignment(assignmentId: String) = mappingsByUser.values.find { it.id == assignmentId }
-
-    fun findAssignment(user: User?): Assignment? = mappingsByUser[user]
 
 }

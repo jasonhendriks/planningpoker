@@ -1,4 +1,4 @@
-package ca.hendriks.planningpoker.routing
+package ca.hendriks.planningpoker.web
 
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
 import ca.hendriks.planningpoker.room.RoomRepository
@@ -71,7 +71,7 @@ fun Application.configureRouting(
                 } else {
                     logger.debug { "Rendering room with no user" }
                     call.respondHtml {
-                        renderIndex(userSession?.user)
+                        renderIndex()
                     }
                 }
             }
@@ -80,26 +80,27 @@ fun Application.configureRouting(
         sse("/assignments/{id}/sse") {
             val assignmentId = call.parameters["id"]!!
             val assignment = usersToRoom.findAssignment(assignmentId)
-            require(assignment != null) { "Assignment not found for id $assignmentId" }
-            val room = assignment.room
-            SseSessionManager.registerSession(this)
-            SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
-            try {
-                logger.debug { "Client connected to SSE" }
-                while (true) {
-                    send(
-                        ServerSentEvent(
-                            "",
-                            event = "keep-alive"
+            assignment?.let {
+                val room = assignment.room
+                SseSessionManager.registerSession(this)
+                SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
+                try {
+                    logger.debug { "Client connected to SSE" }
+                    while (true) {
+                        send(
+                            ServerSentEvent(
+                                "",
+                                event = "keep-alive"
+                            )
                         )
-                    )
-                    delay(1000)
+                        delay(1000)
+                    }
+                } finally {
+                    logger.debug { "Client disconnected from SSE" }
+                    SseSessionManager.removeSession(this)
+                    usersToRoom.unassign(assignmentId)
+                    SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
                 }
-            } finally {
-                logger.debug { "Client disconnected from SSE" }
-                SseSessionManager.removeSession(this)
-                usersToRoom.unassign(assignmentId)
-                SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
             }
         }
     }

@@ -34,17 +34,17 @@ class AssignmentSteps {
 
     @When("the user attempts to vote")
     fun the_user_attempts_to_vote() {
-        assignment.userVotes()
+        assignment = assignment.userVotes(true)
     }
 
     @Then("a vote should be recorded")
     fun a_vote_should_be_recorded() {
-        assignment.getVote() shouldNotBe null
+        assignment.vote shouldNotBe null
     }
 
     @Then("no vote should be recorded")
     fun no_vote_should_be_recorded() {
-        assignment.getVote() shouldBe null
+        assignment.vote shouldBe null
     }
 
 }

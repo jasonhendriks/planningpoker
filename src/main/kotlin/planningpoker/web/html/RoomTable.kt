@@ -1,7 +1,6 @@
 package ca.hendriks.planningpoker.web.html
 
 import ca.hendriks.planningpoker.assignment.Assignment
-import ca.hendriks.planningpoker.user.User
 import kotlinx.html.FlowContent
 import kotlinx.html.button
 import kotlinx.html.classes
@@ -9,11 +8,8 @@ import kotlinx.html.div
 import kotlinx.html.form
 import kotlinx.html.h1
 import kotlinx.html.id
-import kotlinx.html.li
-import kotlinx.html.p
 import kotlinx.html.span
 import kotlinx.html.stream.createHTML
-import kotlinx.html.ul
 
 fun FlowContent.insertSseFragment(assignment: Assignment) =
     div {
@@ -25,17 +21,17 @@ fun FlowContent.insertSseFragment(assignment: Assignment) =
         attributes["sse-swap"] = "update"
     }
 
-fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = createHTML()
+fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignment>) = createHTML()
     .div {
 
         id = "room"
 
         h1 {
-            +"Welcome to room ${assignment.room.name}"
+            +"Welcome to room ${myAssignment.room.name}"
         }
 
         form {
-            attributes["hx-delete"] = "/assignments/${assignment.id}"
+            attributes["hx-delete"] = "/assignments/${myAssignment.id}"
             attributes["hx-target"] = "#room-sse"
             attributes["hx-swap"] = "outerHTML"
 
@@ -57,13 +53,29 @@ fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = create
 
             id = "poker-table"
 
-            p {
-                ul {
-                    +"Users in this room:"
-
-                    users.forEach { user ->
-                        li {
-                            +user.name
+            div {
+                id = "user-cards"
+                classes = setOf("card-container")
+                assignments.forEach {
+                    div {
+                        classes = setOf("card-wrapper")
+                        div {
+                            val cardClasses = setOf("card")
+                            if (it.vote != null) {
+                                cardClasses.plus("face-down")
+                            }
+                            classes = cardClasses
+                            // <!-- Card content goes here (e.g., image, text) -->
+                            div {
+                                classes = setOf("")
+                                span {
+                                    +it.vote?.toString().orEmpty()
+                                }
+                            }
+                        }
+                        div {
+                            classes = setOf("label")
+                            +it.user.name
                         }
                     }
                 }
@@ -71,19 +83,28 @@ fun insertRoomFragment(assignment: Assignment, users: Collection<User>) = create
 
             div {
                 id = "selectable-cards"
-                val cards = listOf("1", "2", "3", "5", "8")
+                classes = setOf("card-container")
+                val cards = listOf("1", "2", "3", "5", "8", "13")
                 cards.forEach {
                     div {
-                        classes = setOf("card")
+                        classes = setOf("card-wrapper")
                         div {
-                            classes = setOf("corner top-left")
-                            span {
-                                +it
+                            classes = setOf("card face-up")
+                            // <!-- Card content goes here (e.g., image, text) -->
+                            div {
+                                classes = setOf("corner top-left")
+                                span {
+                                    +it
+                                }
                             }
+                        }
+                        div {
+                            classes = setOf("label")
                         }
                     }
                 }
             }
+
 
         }
 

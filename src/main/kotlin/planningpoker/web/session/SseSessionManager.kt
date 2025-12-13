@@ -1,7 +1,6 @@
 package ca.hendriks.planningpoker.routing.session
 
 import ca.hendriks.planningpoker.assignment.Assignment
-import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.insertRoomFragment
 import io.ktor.server.sse.ServerSSESession
@@ -27,8 +26,8 @@ object SseSessionManager {
         sessions.remove(session)
     }
 
-    suspend fun broadcastUpdate(assignment: Assignment, users: Collection<User>) {
-        broadcastUpdate(insertRoomFragment(assignment, users))
+    suspend fun broadcastUpdate(myAssignment: Assignment, assignments: Collection<Assignment>) {
+        broadcastUpdate(insertRoomFragment(myAssignment, assignments))
     }
 
     suspend fun broadcastUpdate(data: String) {

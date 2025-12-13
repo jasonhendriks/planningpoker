@@ -7,6 +7,7 @@ import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.util.info
+import ca.hendriks.planningpoker.web.LOBBY_PATH
 import ca.hendriks.planningpoker.web.html.insertJoinRoomForm
 import ca.hendriks.planningpoker.web.html.insertSseFragment
 import io.ktor.http.ContentType
@@ -46,7 +47,7 @@ fun Application.configureHtmxRouting(
                     if (assignment != null) {
                         usersToRoom.unassign(assignmentId)
                         val room = assignment.room
-                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findUsersForRoom(room))
+                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
                     }
                     val userSession: UserSession? = call.sessions.get()
                     call.response.headers.append("HX-Replace-Url", "/")
