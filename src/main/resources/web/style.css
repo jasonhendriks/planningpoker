@@ -25,10 +25,6 @@
 }
 
 #selectable-cards {
-    display: flex;
-    gap: 1.5em; /* Adds space between the cards */
-    flex-wrap: wrap; /* Allows cards to wrap to the next line if the screen is too narrow */
-    justify-content: center;
 }
 
 .card {
@@ -93,4 +89,12 @@
     width: calc(10% - 10px); /* Adjusts width to fit 10 items in a row with gap */
     box-sizing: border-box; /* Ensures padding/border is included in width calculation */
     margin-bottom: 20px; /* Space between rows */
+}
+
+.card-grid-container {
+    display: grid;
+    /* Creates 10 equal-width columns */
+    grid-template-columns: repeat(10, 1fr);
+    gap: 1rem; /* Uniform spacing between cards and rows */
+    padding: 1rem;
 }

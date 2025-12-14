@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
 class AssignmentRepository {
 
     private val logger = LoggerFactory.getLogger(AssignmentRepository::class.java)
-
     private val mappingsByUser = mutableMapOf<User, Assignment>()
     private val mutex = Mutex()
 
@@ -20,10 +19,6 @@ class AssignmentRepository {
 
     fun findAssignments(room: Room): Collection<Assignment> =
         mappingsByUser.filterValues { it.room == room }.values
-
-    fun findUsers(room: Room): Collection<User> {
-        return mappingsByUser.filterValues { it.room == room }.keys
-    }
 
     suspend fun assignUserToRoom(user: User, room: Room): Assignment {
         mutex.withLock {

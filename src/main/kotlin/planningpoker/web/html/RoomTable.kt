@@ -35,16 +35,12 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
             attributes["hx-target"] = "#room-sse"
             attributes["hx-swap"] = "outerHTML"
 
-            // Button
             div {
-                classes = setOf("w-full px-3 sm:w-1/4 pt-8")
-
-                button {
-                    classes =
-                        setOf("cursor-pointer rounded-md bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none")
-
-                    +"Leave Room"
-                }
+                classes = setOf("-mx-3 flex flex-wrap")
+                // Leave Room Button
+                drawButton("Leave Room")
+                drawButton("Start Vote", false)
+                drawButton("Reveal Votes", false)
             }
 
         }
@@ -108,4 +104,21 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
 
         }
 
+    }
+
+fun FlowContent.drawButton(text: String, enableButton: Boolean = true) =
+    div {
+        classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+        button {
+            disabled = !enableButton
+            var buttonCss =
+                setOf("bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none rounded-full")
+            if (enableButton) {
+                buttonCss = buttonCss.plus("cursor-pointer")
+            } else {
+                buttonCss = buttonCss.plus("opacity-50 cursor-not-allowed")
+            }
+            classes = buttonCss
+            +text
+        }
     }
