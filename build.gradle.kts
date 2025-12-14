@@ -72,15 +72,15 @@ dependencies {
     implementation(libs.logback.classic)
 
     testImplementation(ktorLibs.server.testHost)
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:6.0.7")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:6.0.7")
-    testImplementation("io.kotest:kotest-framework-datatest-jvm:6.0.7")
+    testImplementation(libs.kotest.assertions.core.jvm)
+    testImplementation(libs.kotest.framework.datatest.jvm)
+    testImplementation(libs.kotest.runner.junit5.jvm)
 
-    intTestImplementation("io.kotest:kotest-assertions-core-jvm:6.0.7")
-    intTestImplementation(ktorLibs.client.core)
-    intTestImplementation(ktorLibs.client.cio)
-    intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
     intTestImplementation("org.junit.platform:junit-platform-suite")
     intTestImplementation("org.seleniumhq.selenium:selenium-java:4.39.0")
+    intTestImplementation(ktorLibs.client.cio)
+    intTestImplementation(ktorLibs.client.core)
+    intTestImplementation(libs.bundles.cucumber.libs)
+    intTestImplementation(libs.kotest.assertions.core.jvm)
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
