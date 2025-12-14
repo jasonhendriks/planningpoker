@@ -41,7 +41,11 @@
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-#selectable-cards .card:hover {
+.voting-disabled .card {
+
+}
+
+#selectable-cards .voting-enabled .card:hover {
   background-color: yellow;
   /* Deeper shadow on hover */
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);

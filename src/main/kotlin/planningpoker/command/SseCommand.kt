@@ -15,7 +15,7 @@ class SseCommand(
     val receiver: Receiver
 ) : Command {
 
-    private val logger = LoggerFactory.getLogger("WebRouting")
+    private val logger = LoggerFactory.getLogger(SseCommand::class.java)
 
     override fun execute(): Unit = runBlocking {
         val assignment = receiver.usersToRoom.findAssignment(assignmentId)

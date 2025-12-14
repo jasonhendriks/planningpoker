@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 
 class CloseVotingCommand(val roomName: String, val receiver: Receiver) : Command {
 
-    private val logger = LoggerFactory.getLogger("WebRouting")
+    private val logger = LoggerFactory.getLogger(CloseVotingCommand::class.java)
 
     override fun execute() {
         receiver.roomRepository

@@ -128,7 +128,13 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
                 val cards = listOf("1", "2", "3", "5", "8", "13")
                 cards.forEach {
                     div {
-                        classes = setOf("card-wrapper")
+                        var cssClasses = setOf("card-wrapper")
+                        if (enableStartVotingButton) {
+                            cssClasses = cssClasses.plus("voting-disabled opacity-50 cursor-not-allowed")
+                        } else {
+                            cssClasses = cssClasses.plus("voting-enabled")
+                        }
+                        classes = cssClasses
                         div {
                             classes = setOf("card face-up")
                             // <!-- Card content goes here (e.g., image, text) -->
