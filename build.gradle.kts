@@ -72,11 +72,11 @@ dependencies {
     implementation(libs.logback.classic)
 
     testImplementation(ktorLibs.server.testHost)
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
-    testImplementation("io.kotest:kotest-framework-datatest-jvm:5.7.2")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:6.0.7")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:6.0.7")
+    testImplementation("io.kotest:kotest-framework-datatest-jvm:6.0.7")
 
-    intTestImplementation("io.kotest:kotest-assertions-core-jvm:5.7.2")
+    intTestImplementation("io.kotest:kotest-assertions-core-jvm:6.0.7")
     intTestImplementation(ktorLibs.client.core)
     intTestImplementation(ktorLibs.client.cio)
     intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
