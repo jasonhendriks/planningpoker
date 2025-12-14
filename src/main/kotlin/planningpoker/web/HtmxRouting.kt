@@ -1,14 +1,13 @@
 package ca.hendriks.planningpoker.web
 
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
+import ca.hendriks.planningpoker.command.LeaveRoomCommand
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.util.info
-import ca.hendriks.planningpoker.web.html.insertJoinRoomForm
 import ca.hendriks.planningpoker.web.html.insertSseFragment
-import ca.hendriks.planningpoker.web.session.SseSessionManager
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
@@ -41,19 +40,11 @@ fun Application.configureHtmxRouting(
             route(LOBBY_PATH) {
                 delete("/assignments/{id}") {
                     logger.info { "HTMX -> Back to Lobby" }
-                    val assignmentId = call.parameters["id"]!!
-                    val assignment = usersToRoom.findAssignment(assignmentId)
-                    if (assignment != null) {
-                        usersToRoom.unassign(assignmentId)
-                        val room = assignment.room
-                        SseSessionManager.broadcastUpdate(usersToRoom.findAssignments(room))
+                    val assignmentId = call.parameters["id"]
+                    assignmentId?.let {
+                        LeaveRoomCommand(it, call.receiver(roomRepository, usersToRoom))
+                            .execute()
                     }
-                    val userSession: UserSession? = call.sessions.get()
-                    call.response.headers.append("HX-Replace-Url", "/")
-                    call.respondText(
-                        createHTML().div { insertJoinRoomForm(userSession?.user) },
-                        contentType = ContentType.Text.Html
-                    )
                 }
             }
 

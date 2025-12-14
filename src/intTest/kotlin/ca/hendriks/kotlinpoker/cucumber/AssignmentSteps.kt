@@ -16,7 +16,7 @@ class AssignmentSteps {
     private lateinit var assignment: Assignment
 
     @Given("user {string} joins room {string}")
-    fun user_joins_room(userName: String, roomName: String) = runBlocking {
+    fun userJoinsRoom(userName: String, roomName: String) = runBlocking {
         val room = TestDependices.roomRepository.findOrCreateRoom(roomName)
         val user = User(userName)
         assignment = TestDependices.usersToRoom.assignUserToRoom(user, room)

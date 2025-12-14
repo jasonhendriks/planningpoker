@@ -41,7 +41,7 @@ class AssignmentRepository {
             val assignment = findAssignment(assignmentId)
             if (assignment != null) {
                 mappingsByUser.remove(assignment.user)
-                logger.debug { "Unassigned user ${assignment.user} from room ${assignment.room}" }
+                logger.debug { "Unassigned user ${assignment.user} from ${assignment.room}" }
             }
         }
     }
