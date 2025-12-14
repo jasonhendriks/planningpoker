@@ -94,8 +94,8 @@ Heroku
 | `POST /assignment?room-name={room-name}&user-name={user-name}` | assign current user to room / return SSE room fragment     |
 | `GET /assignments/{id}/sse`                                    | connect to SSE stream for current user / return SSE stream |
 | `DELETE /assignments/{id}`                                     | remove current user from room / return lobby fragment      |
-| `POST /room/{room-name}/voting`                                |                                                            |                                                              
-| `DELETE /room/{room-name}/voting`                              |                                                            |                                                              
+| `POST /room/{room-name}/voting`                                | open voting                                                |                                                              
+| `DELETE /room/{room-name}/voting`                              | close voting                                               |                                                              
 | `POST /vote/{id}`                                              |                                                            |                                                              
 
 ## JSON API:

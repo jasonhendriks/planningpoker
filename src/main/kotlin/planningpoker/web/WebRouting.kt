@@ -1,20 +1,22 @@
 package ca.hendriks.planningpoker.web
 
+import ca.hendriks.planningpoker.Receiver
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
+import ca.hendriks.planningpoker.room.CloseVotingCommand
+import ca.hendriks.planningpoker.room.OpenVotingCommand
 import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
-import ca.hendriks.planningpoker.util.info
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -111,39 +113,26 @@ fun Application.configureRouting(
         route("/room/{room-name}/voting") {
             post {
                 call.parameters["room-name"]
-                    .let {
-                        logger.info { "Voting is now open in room $it" }
-                        it?.let {
-                            roomRepository
-                                .findOrCreateRoom(it)
-                                .openVoting()
-                        }
+                    ?.let {
+                        val receiver = call.receiver(roomRepository, usersToRoom)
+                        OpenVotingCommand(it, receiver)
+                            .execute()
                     }
-                val userSession: UserSession? = call.sessions.get()
-                userSession?.user?.let {
-                    usersToRoom.findAssignment(it)?.let { assignment ->
-                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(assignment.room))
-                    }
-                }
-                call.respond(HttpStatusCode.NoContent, "")
             }
             delete {
                 call.parameters["room-name"]
                     ?.let {
-                        logger.info { "Voting is now closed in room $it" }
-                    roomRepository
-                        .findOrCreateRoom(it)
-                        .closeVoting()
+                        val receiver = call.receiver(roomRepository, usersToRoom)
+                        CloseVotingCommand(it, receiver)
+                            .execute()
                 }
-                val userSession: UserSession? = call.sessions.get()
-                userSession?.user?.let {
-                    usersToRoom.findAssignment(it)?.let { assignment ->
-                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(assignment.room))
-                    }
-                }
-                call.respond(HttpStatusCode.NoContent, "")
             }
         }
     }
 
+}
+
+fun RoutingCall.receiver(roomRepository: RoomRepository, usersToRoom: AssignmentRepository): Receiver {
+    val userSession: UserSession? = this.sessions.get()
+    return Receiver(this, roomRepository, usersToRoom, userSession?.user)
 }

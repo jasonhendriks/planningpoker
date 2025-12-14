@@ -14,7 +14,7 @@ import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.runBlocking
 
-class Steps {
+class CucumberHooks {
 
     companion object {
         const val PORT = 8888

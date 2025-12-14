@@ -1,6 +1,6 @@
 package ca.hendriks.kotlinpoker.cucumber
 
-import ca.hendriks.kotlinpoker.cucumber.Steps.TestDependices
+import ca.hendriks.kotlinpoker.cucumber.CucumberHooks.TestDependices
 import ca.hendriks.planningpoker.assignment.Assignment
 import ca.hendriks.planningpoker.user.User
 import io.cucumber.java.en.Given
