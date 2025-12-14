@@ -1,14 +1,14 @@
-package ca.hendriks.planningpoker.room
+package ca.hendriks.planningpoker.command
 
 import ca.hendriks.planningpoker.Receiver
 import ca.hendriks.planningpoker.util.info
 import org.slf4j.LoggerFactory
 
-class OpenVotingCommand(val roomName: String, val receiver: Receiver) {
+class OpenVotingCommand(val roomName: String, val receiver: Receiver) : Command {
 
     private val logger = LoggerFactory.getLogger("WebRouting")
 
-    fun execute() {
+    override fun execute() {
         receiver.roomRepository
             .findOrCreateRoom(roomName)
             .openVoting()

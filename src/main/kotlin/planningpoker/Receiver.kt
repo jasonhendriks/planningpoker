@@ -5,12 +5,12 @@ import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.user.User
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.response.respond
-import io.ktor.server.routing.RoutingCall
 import kotlinx.coroutines.runBlocking
 
 class Receiver(
-    val call: RoutingCall,
+    val call: ApplicationCall,
     val roomRepository: RoomRepository,
     val usersToRoom: AssignmentRepository,
     val me: User?

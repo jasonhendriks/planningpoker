@@ -2,21 +2,21 @@ package ca.hendriks.planningpoker.web
 
 import ca.hendriks.planningpoker.Receiver
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
-import ca.hendriks.planningpoker.room.CloseVotingCommand
-import ca.hendriks.planningpoker.room.OpenVotingCommand
+import ca.hendriks.planningpoker.command.CloseVotingCommand
+import ca.hendriks.planningpoker.command.OpenVotingCommand
+import ca.hendriks.planningpoker.command.SseCommand
 import ca.hendriks.planningpoker.room.RoomRepository
-import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -25,8 +25,6 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
-import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.delay
 import kotlinx.html.html
 import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
@@ -85,29 +83,9 @@ fun Application.configureRouting(
 
         sse("/assignments/{id}/sse") {
             val assignmentId = call.parameters["id"]!!
-            val assignment = usersToRoom.findAssignment(assignmentId)
-            assignment?.let {
-                val room = assignment.room
-                SseSessionManager.registerSession(this)
-                SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
-                try {
-                    logger.debug { "Client connected to SSE" }
-                    while (true) {
-                        send(
-                            ServerSentEvent(
-                                "",
-                                event = "keep-alive"
-                            )
-                        )
-                        delay(1000)
-                    }
-                } finally {
-                    logger.debug { "Client disconnected from SSE" }
-                    SseSessionManager.removeSession(this)
-                    usersToRoom.unassign(assignmentId)
-                    SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
-                }
-            }
+            val receiver = call.receiver(roomRepository, usersToRoom)
+            SseCommand(this, assignmentId, receiver)
+                .execute()
         }
 
         route("/room/{room-name}/voting") {
@@ -132,7 +110,7 @@ fun Application.configureRouting(
 
 }
 
-fun RoutingCall.receiver(roomRepository: RoomRepository, usersToRoom: AssignmentRepository): Receiver {
+fun ApplicationCall.receiver(roomRepository: RoomRepository, usersToRoom: AssignmentRepository): Receiver {
     val userSession: UserSession? = this.sessions.get()
     return Receiver(this, roomRepository, usersToRoom, userSession?.user)
 }
