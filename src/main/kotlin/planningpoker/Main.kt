@@ -2,9 +2,9 @@ package ca.hendriks.planningpoker
 
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
 import ca.hendriks.planningpoker.room.RoomRepository
-import ca.hendriks.planningpoker.routing.configureHtmxRouting
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
+import ca.hendriks.planningpoker.web.configureHtmxRouting
 import ca.hendriks.planningpoker.web.configureRouting
 import io.ktor.server.application.install
 import io.ktor.server.engine.EmbeddedServer

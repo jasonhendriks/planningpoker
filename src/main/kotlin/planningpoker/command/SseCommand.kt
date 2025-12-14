@@ -1,8 +1,8 @@
 package ca.hendriks.planningpoker.command
 
 import ca.hendriks.planningpoker.Receiver
-import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.util.debug
+import ca.hendriks.planningpoker.web.session.SseSessionManager
 import io.ktor.server.sse.ServerSSESession
 import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.delay
@@ -20,18 +20,18 @@ class SseCommand(
     override fun execute(): Unit = runBlocking {
         val assignment = receiver.usersToRoom.findAssignment(assignmentId)
         assignment?.let {
-            SseSessionManager.registerSession(session)
+            SseSessionManager.addSession(assignment, session)
             receiver.broadcastUpdate()
             try {
                 logger.debug { "Client connected to SSE" }
                 while (true) {
+                    delay(1000)
                     session.send(
                         ServerSentEvent(
                             "",
                             event = "keep-alive"
                         )
                     )
-                    delay(1000)
                 }
             } finally {
                 logger.debug { "Client disconnected from SSE" }

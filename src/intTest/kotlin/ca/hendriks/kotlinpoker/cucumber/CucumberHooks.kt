@@ -6,13 +6,12 @@ import ca.hendriks.planningpoker.room.RoomRepository
 import io.cucumber.java.AfterAll
 import io.cucumber.java.BeforeAll
 import io.cucumber.java.en.Given
-import io.kotest.matchers.shouldNotBe
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.runBlocking
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.safari.SafariDriver
+import java.time.Duration
 
 class CucumberHooks {
 
@@ -22,10 +21,18 @@ class CucumberHooks {
 
     @Given("my application")
     fun rootRouteRespondsWithHelloWorldString(): Unit = runBlocking {
-        val response: String = HttpClient()
-            .get("http://localhost:$PORT/")
-            .body()
-        response shouldNotBe null
+
+        // Initiate Webdriver
+        val driver: WebDriver = SafariDriver()
+
+        // adding implicit wait of 15 seconds
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15))
+
+        // URL launch
+        driver.get("http://localhost:$PORT/")
+
+        // get browser title after browser launch
+        println("Browser title: " + driver.title)
     }
 
     object TestDependices {

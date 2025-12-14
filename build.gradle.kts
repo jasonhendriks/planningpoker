@@ -81,5 +81,6 @@ dependencies {
     intTestImplementation(ktorLibs.client.cio)
     intTestImplementation(libs.bundles.cucumber.libs) // Or use individual references
     intTestImplementation("org.junit.platform:junit-platform-suite")
+    intTestImplementation("org.seleniumhq.selenium:selenium-java:4.39.0")
     intTestRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

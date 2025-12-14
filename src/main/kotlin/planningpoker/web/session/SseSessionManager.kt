@@ -1,4 +1,4 @@
-package ca.hendriks.planningpoker.routing.session
+package ca.hendriks.planningpoker.web.session
 
 import ca.hendriks.planningpoker.assignment.Assignment
 import ca.hendriks.planningpoker.util.debug
@@ -13,29 +13,33 @@ import java.util.concurrent.CopyOnWriteArrayList
 object SseSessionManager {
 
     private val logger = LoggerFactory.getLogger(SseSessionManager::class.simpleName)
-    private val sessions = CopyOnWriteArrayList<ServerSSESession>()
+    private val sessions = CopyOnWriteArrayList<SseSessionAndPokerAssignment>()
     private val mutex = Mutex()
 
-    fun registerSession(session: ServerSSESession) {
+    fun addSession(assignment: Assignment, session: ServerSSESession) {
         logger.debug { "Tracking new session: ${session.hashCode()}" }
-        sessions.add(session)
+        sessions.add(SseSessionAndPokerAssignment(session, assignment))
     }
 
     fun removeSession(session: ServerSSESession) {
         logger.debug { "Stopped tracking session: ${session.hashCode()}" }
-        sessions.remove(session)
+        sessions.removeIf { it.session == session }
     }
 
-    suspend fun broadcastUpdate(myAssignment: Assignment, assignments: Collection<Assignment>) {
-        broadcastUpdate(insertRoomFragment(myAssignment, assignments))
+    suspend fun broadcastUpdate(assignments: Collection<Assignment>) {
+        broadcastUpdate(assignments, insertRoomFragment())
     }
 
-    suspend fun broadcastUpdate(data: String) {
+    suspend fun broadcastUpdate(
+        assignments: Collection<Assignment>,
+        data: (myAssignment: Assignment, Collection<Assignment>) -> String
+    ) {
         mutex.withLock {
             // Send the data to all active sessions
             for (session in sessions) {
                 try {
-                    session.send(ServerSentEvent(data, "update"))
+                    val content = data.invoke(session.assignment, assignments)
+                    session.session.send(ServerSentEvent(content, "update"))
                 } catch (e: Exception) {
                     // Handle broken connections
                     logger.debug { "Client disconnected from SSE: ${e.message}" }
@@ -45,3 +49,8 @@ object SseSessionManager {
         }
     }
 }
+
+data class SseSessionAndPokerAssignment(
+    val session: ServerSSESession,
+    val assignment: Assignment
+)
