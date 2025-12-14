@@ -7,13 +7,16 @@ import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
@@ -100,6 +103,34 @@ fun Application.configureRouting(
                     SseSessionManager.removeSession(this)
                     usersToRoom.unassign(assignmentId)
                     SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(room))
+                }
+            }
+        }
+
+        route("/room/{room-name}/voting") {
+            post {
+                call.parameters["room-name"]
+                    .let {
+                        it?.let {
+                            roomRepository
+                                .findOrCreateRoom(it)
+                                .openVoting()
+                        }
+                    }
+                val userSession: UserSession? = call.sessions.get()
+                userSession?.user?.let {
+                    usersToRoom.findAssignment(it)?.let { it ->
+                        SseSessionManager.broadcastUpdate(it, usersToRoom.findAssignments(it.room))
+                    }
+                }
+                call.respond(HttpStatusCode.NoContent, "")
+            }
+            delete {
+                val roomName = call.parameters["room-name"]
+                roomName?.let {
+                    roomRepository
+                        .findOrCreateRoom(it)
+                        .closeVoting()
                 }
             }
         }

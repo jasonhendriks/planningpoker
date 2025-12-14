@@ -24,6 +24,9 @@ fun FlowContent.insertSseFragment(assignment: Assignment) =
 fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignment>) = createHTML()
     .div {
 
+        val enableStartVotingButton = !myAssignment.room.isVotingOpen()
+        val enableRevealVotesButton = myAssignment.room.isVotingOpen()
+
         id = "room"
 
         h1 {
@@ -39,8 +42,8 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
                 classes = setOf("-mx-3 flex flex-wrap")
                 // Leave Room Button
                 drawButton("Leave Room")
-                drawButton("Start Vote", false)
-                drawButton("Reveal Votes", false)
+                drawButton("Start Vote", enableStartVotingButton)
+                drawButton("Reveal Votes", enableRevealVotesButton)
             }
 
         }

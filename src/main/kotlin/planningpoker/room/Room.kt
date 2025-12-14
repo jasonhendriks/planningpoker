@@ -2,7 +2,7 @@ package ca.hendriks.planningpoker.room
 
 data class Room(val name: String) {
 
-    private var voting: VotingState = VotingState.CLOSED
+    private var voting: VotingState = VotingState.NEW
 
     fun openVoting() {
         voting = VotingState.OPEN
@@ -18,5 +18,5 @@ data class Room(val name: String) {
 }
 
 enum class VotingState {
-    OPEN, CLOSED
+    NEW, OPEN, CLOSED
 }
