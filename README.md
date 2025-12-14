@@ -96,7 +96,7 @@ Heroku
 | `DELETE /assignments/{id}`                                     | remove current user from room / return lobby fragment      |
 | `POST /room/{room-name}/voting`                                | open voting                                                |                                                              
 | `DELETE /room/{room-name}/voting`                              | close voting                                               |                                                              
-| `POST /vote/{id}`                                              |                                                            |                                                              
+| `POST /assignments/{id}/vote`                                  | vote                                                       |                                                              
 
 ## JSON API:
 

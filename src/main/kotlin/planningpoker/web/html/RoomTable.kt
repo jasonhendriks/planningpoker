@@ -129,10 +129,10 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
                 cards.forEach {
                     div {
                         var cssClasses = setOf("card-wrapper")
-                        if (enableStartVotingButton) {
-                            cssClasses = cssClasses.plus("voting-disabled opacity-50 cursor-not-allowed")
+                        cssClasses = if (enableStartVotingButton) {
+                            cssClasses.plus("voting-disabled opacity-50 cursor-not-allowed")
                         } else {
-                            cssClasses = cssClasses.plus("voting-enabled")
+                            cssClasses.plus("voting-enabled")
                         }
                         classes = cssClasses
                         div {
