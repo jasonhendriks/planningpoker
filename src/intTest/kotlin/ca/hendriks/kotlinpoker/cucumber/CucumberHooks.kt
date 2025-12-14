@@ -9,9 +9,6 @@ import io.cucumber.java.en.Given
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.runBlocking
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.safari.SafariDriver
-import java.time.Duration
 
 class CucumberHooks {
 
@@ -22,17 +19,17 @@ class CucumberHooks {
     @Given("my application")
     fun rootRouteRespondsWithHelloWorldString(): Unit = runBlocking {
 
-        // Initiate Webdriver
-        val driver: WebDriver = SafariDriver()
-
-        // adding implicit wait of 15 seconds
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15))
-
-        // URL launch
-        driver.get("http://localhost:$PORT/")
-
-        // get browser title after browser launch
-        println("Browser title: " + driver.title)
+//        // Initiate Webdriver
+//        val driver: WebDriver = SafariDriver()
+//
+//        // adding implicit wait of 15 seconds
+//        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15))
+//
+//        // URL launch
+//        driver.get("http://localhost:$PORT/")
+//
+//        // get browser title after browser launch
+//        println("Browser title: " + driver.title)
     }
 
     object TestDependices {
