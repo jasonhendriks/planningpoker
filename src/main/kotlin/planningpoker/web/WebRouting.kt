@@ -5,6 +5,7 @@ import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.SseSessionManager
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
+import ca.hendriks.planningpoker.util.info
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -111,6 +112,7 @@ fun Application.configureRouting(
             post {
                 call.parameters["room-name"]
                     .let {
+                        logger.info { "Voting is now open in room $it" }
                         it?.let {
                             roomRepository
                                 .findOrCreateRoom(it)
@@ -119,19 +121,27 @@ fun Application.configureRouting(
                     }
                 val userSession: UserSession? = call.sessions.get()
                 userSession?.user?.let {
-                    usersToRoom.findAssignment(it)?.let { it ->
-                        SseSessionManager.broadcastUpdate(it, usersToRoom.findAssignments(it.room))
+                    usersToRoom.findAssignment(it)?.let { assignment ->
+                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(assignment.room))
                     }
                 }
                 call.respond(HttpStatusCode.NoContent, "")
             }
             delete {
-                val roomName = call.parameters["room-name"]
-                roomName?.let {
+                call.parameters["room-name"]
+                    ?.let {
+                        logger.info { "Voting is now closed in room $it" }
                     roomRepository
                         .findOrCreateRoom(it)
                         .closeVoting()
                 }
+                val userSession: UserSession? = call.sessions.get()
+                userSession?.user?.let {
+                    usersToRoom.findAssignment(it)?.let { assignment ->
+                        SseSessionManager.broadcastUpdate(assignment, usersToRoom.findAssignments(assignment.room))
+                    }
+                }
+                call.respond(HttpStatusCode.NoContent, "")
             }
         }
     }

@@ -34,16 +34,58 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
         }
 
         form {
-            attributes["hx-delete"] = "/assignments/${myAssignment.id}"
-            attributes["hx-target"] = "#room-sse"
-            attributes["hx-swap"] = "outerHTML"
 
             div {
                 classes = setOf("-mx-3 flex flex-wrap")
+
                 // Leave Room Button
-                drawButton("Leave Room")
-                drawButton("Start Vote", enableStartVotingButton)
-                drawButton("Reveal Votes", enableRevealVotesButton)
+                div {
+                    classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+                    button {
+                        attributes["hx-delete"] = "/assignments/${myAssignment.id}"
+                        attributes["hx-target"] = "#room-sse"
+                        attributes["hx-swap"] = "outerHTML"
+                        classes =
+                            setOf("bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none rounded-full cursor-pointer")
+                        +"Leave Room"
+                    }
+                }
+
+                // Leave Room Button
+                div {
+                    classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+                    button {
+                        attributes["hx-post"] = "/room/${myAssignment.room.name}/voting"
+                        disabled = !enableStartVotingButton
+                        var buttonCss =
+                            setOf("bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none rounded-full")
+                        buttonCss = if (enableStartVotingButton) {
+                            buttonCss.plus("cursor-pointer")
+                        } else {
+                            buttonCss.plus("opacity-50 cursor-not-allowed")
+                        }
+                        classes = buttonCss
+                        +"Start Vote"
+                    }
+                }
+
+                // Reveal Votes Button
+                div {
+                    classes = setOf("w-full px-3 sm:w-1/4 pt-8")
+                    button {
+                        attributes["hx-delete"] = "/room/${myAssignment.room.name}/voting"
+                        disabled = !enableRevealVotesButton
+                        var buttonCss =
+                            setOf("bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none rounded-full")
+                        buttonCss = if (enableRevealVotesButton) {
+                            buttonCss.plus("cursor-pointer")
+                        } else {
+                            buttonCss.plus("opacity-50 cursor-not-allowed")
+                        }
+                        classes = buttonCss
+                        +"Reveal Votes"
+                    }
+                }
             }
 
         }
@@ -107,21 +149,4 @@ fun insertRoomFragment(myAssignment: Assignment, assignments: Collection<Assignm
 
         }
 
-    }
-
-fun FlowContent.drawButton(text: String, enableButton: Boolean = true) =
-    div {
-        classes = setOf("w-full px-3 sm:w-1/4 pt-8")
-        button {
-            disabled = !enableButton
-            var buttonCss =
-                setOf("bg-slate-800 py-3 px-8 text-center text-base font-semibold text-white outline-none rounded-full")
-            if (enableButton) {
-                buttonCss = buttonCss.plus("cursor-pointer")
-            } else {
-                buttonCss = buttonCss.plus("opacity-50 cursor-not-allowed")
-            }
-            classes = buttonCss
-            +text
-        }
     }
