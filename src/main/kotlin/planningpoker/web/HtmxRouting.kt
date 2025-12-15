@@ -21,6 +21,7 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.getOrSet
 import io.ktor.server.sessions.sessions
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
 fun Application.configureHtmxRouting(receiver: CommandReceiver) {
@@ -36,15 +37,11 @@ fun Application.configureHtmxRouting(receiver: CommandReceiver) {
 
                     call.parameters["id"]?.let { assignmentId ->
                         val userSession: UserSession? = call.sessions.get()
-
                         val command = LeaveRoomCommand(assignmentId, userSession?.user, receiver)
                         command.execute()
 
                         replaceUrl("/")
-                        call.respondText(
-                            text = command.getContent(),
-                            contentType = ContentType.Text.Html
-                        )
+                        response(command.getContent())
                     }
                 }
             }
@@ -64,10 +61,7 @@ fun Application.configureHtmxRouting(receiver: CommandReceiver) {
                     command.execute()
 
                     replaceUrl("/room/$roomName")
-                    call.respondText(
-                        text = command.content,
-                        contentType = ContentType.Text.Html
-                    )
+                    response(command.content)
                 }
 
             }
@@ -76,6 +70,13 @@ fun Application.configureHtmxRouting(receiver: CommandReceiver) {
 
     }
 
+}
+
+private fun RoutingContext.response(content: String) = runBlocking {
+    call.respondText(
+        text = content,
+        contentType = ContentType.Text.Html
+    )
 }
 
 private fun RoutingContext.replaceUrl(value: String) {

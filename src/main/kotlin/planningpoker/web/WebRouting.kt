@@ -15,6 +15,7 @@ import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -23,6 +24,7 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
+import kotlinx.coroutines.runBlocking
 import kotlinx.html.html
 import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
@@ -87,31 +89,35 @@ fun Application.configureRouting(receiver: CommandReceiver) {
         route("/room/{room-name}/voting") {
             post {
                 call.parameters["room-name"]
-                    ?.let {
+                    ?.let { roomName ->
                         val userSession: UserSession? = call.sessions.get()
                         OpenVotingCommand(
-                            roomName = it,
+                            roomName = roomName,
                             me = userSession?.user,
                             receiver = receiver
                         )
                             .execute()
-                        call.respond(HttpStatusCode.NoContent, "")
+                        respondWithNoContent()
                     }
             }
             delete {
                 call.parameters["room-name"]
-                    ?.let {
+                    ?.let { roomName ->
                         val userSession: UserSession? = call.sessions.get()
                         CloseVotingCommand(
-                            roomName = it,
+                            roomName = roomName,
                             me = userSession?.user,
                             receiver = receiver
                         )
                             .execute()
-                        call.respond(HttpStatusCode.NoContent, "")
+                        respondWithNoContent()
                 }
             }
         }
     }
 
+}
+
+private fun RoutingContext.respondWithNoContent() = runBlocking {
+    call.respond(HttpStatusCode.NoContent, "")
 }

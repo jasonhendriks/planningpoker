@@ -12,9 +12,10 @@ class CommandReceiver(
 ) {
 
     fun broadcastUpdate(me: User?) = runBlocking {
-        me.let {
-            usersToRoom.findAssignment(it)?.let { assignment ->
-                SseSessionManager.broadcastUpdate(usersToRoom.findAssignments(assignment.room))
+        me.let { currentUser ->
+            usersToRoom.findAssignment(currentUser)?.let { assignment ->
+                val assignments = usersToRoom.findAssignments(assignment.room)
+                SseSessionManager.broadcastUpdate(assignments)
             }
         }
     }
