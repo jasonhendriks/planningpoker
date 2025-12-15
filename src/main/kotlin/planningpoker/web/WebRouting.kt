@@ -1,18 +1,16 @@
 package ca.hendriks.planningpoker.web
 
-import ca.hendriks.planningpoker.Receiver
-import ca.hendriks.planningpoker.assignment.AssignmentRepository
+import ca.hendriks.planningpoker.CommandReceiver
 import ca.hendriks.planningpoker.command.CloseVotingCommand
 import ca.hendriks.planningpoker.command.OpenVotingCommand
 import ca.hendriks.planningpoker.command.SseCommand
-import ca.hendriks.planningpoker.room.RoomRepository
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
@@ -31,12 +29,11 @@ import org.slf4j.LoggerFactory
 
 const val LOBBY_PATH = "/"
 
-fun Application.configureRouting(
-    roomRepository: RoomRepository,
-    usersToRoom: AssignmentRepository
-) {
+fun Application.configureRouting(receiver: CommandReceiver) {
 
     val logger = LoggerFactory.getLogger("WebRouting")
+    val usersToRoom = receiver.usersToRoom
+    val roomRepository = receiver.roomRepository
 
     routing {
         staticResources("/css", "web")
@@ -83,7 +80,6 @@ fun Application.configureRouting(
 
         sse("/assignments/{id}/sse") {
             val assignmentId = call.parameters["id"]!!
-            val receiver = call.receiver(roomRepository, usersToRoom)
             SseCommand(this, assignmentId, receiver)
                 .execute()
         }
@@ -92,25 +88,30 @@ fun Application.configureRouting(
             post {
                 call.parameters["room-name"]
                     ?.let {
-                        val receiver = call.receiver(roomRepository, usersToRoom)
-                        OpenVotingCommand(it, receiver)
+                        val userSession: UserSession? = call.sessions.get()
+                        OpenVotingCommand(
+                            roomName = it,
+                            me = userSession?.user,
+                            receiver = receiver
+                        )
                             .execute()
+                        call.respond(HttpStatusCode.NoContent, "")
                     }
             }
             delete {
                 call.parameters["room-name"]
                     ?.let {
-                        val receiver = call.receiver(roomRepository, usersToRoom)
-                        CloseVotingCommand(it, receiver)
+                        val userSession: UserSession? = call.sessions.get()
+                        CloseVotingCommand(
+                            roomName = it,
+                            me = userSession?.user,
+                            receiver = receiver
+                        )
                             .execute()
+                        call.respond(HttpStatusCode.NoContent, "")
                 }
             }
         }
     }
 
-}
-
-fun ApplicationCall.receiver(roomRepository: RoomRepository, usersToRoom: AssignmentRepository): Receiver {
-    val userSession: UserSession? = this.sessions.get()
-    return Receiver(this, roomRepository, usersToRoom, userSession?.user)
 }

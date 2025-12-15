@@ -1,10 +1,11 @@
 package ca.hendriks.planningpoker.command
 
-import ca.hendriks.planningpoker.Receiver
+import ca.hendriks.planningpoker.CommandReceiver
+import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.util.info
 import org.slf4j.LoggerFactory
 
-class OpenVotingCommand(val roomName: String, val receiver: Receiver) : Command {
+class OpenVotingCommand(val roomName: String, val me: User?, val receiver: CommandReceiver) : Command {
 
     private val logger = LoggerFactory.getLogger(OpenVotingCommand::class.java)
 
@@ -12,9 +13,8 @@ class OpenVotingCommand(val roomName: String, val receiver: Receiver) : Command 
         receiver.roomRepository
             .findOrCreateRoom(roomName)
             .openVoting()
-        receiver.broadcastUpdate()
-        receiver.respondWithNoContent()
-        logger.info { "Voting in room $roomName opened by ${receiver.me?.name}" }
+        receiver.broadcastUpdate(me)
+        logger.info { "Voting in room $roomName opened by ${me?.name}" }
     }
 
 }

@@ -38,7 +38,9 @@ fun ktor(
         install(Sessions) {
             cookie<UserSession>("user_session")
         }
-        configureRouting(roomRepository, usersToRoom)
-        configureHtmxRouting(roomRepository, usersToRoom)
+
+        val receiver = CommandReceiver(roomRepository, usersToRoom)
+        configureRouting(receiver)
+        configureHtmxRouting(receiver)
     }
 }

@@ -1,6 +1,6 @@
 package ca.hendriks.planningpoker.command
 
-import ca.hendriks.planningpoker.Receiver
+import ca.hendriks.planningpoker.CommandReceiver
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.session.SseSessionManager
 import io.ktor.server.sse.ServerSSESession
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 class SseCommand(
     val session: ServerSSESession,
     val assignmentId: String,
-    val receiver: Receiver
+    val receiver: CommandReceiver
 ) : Command {
 
     private val logger = LoggerFactory.getLogger(SseCommand::class.java)
@@ -21,7 +21,7 @@ class SseCommand(
         val assignment = receiver.usersToRoom.findAssignment(assignmentId)
         assignment?.let {
             SseSessionManager.addSession(assignment, session)
-            receiver.broadcastUpdate()
+            receiver.broadcastUpdate(assignment.user)
             try {
                 logger.debug { "Client connected to SSE" }
                 while (true) {
@@ -37,7 +37,7 @@ class SseCommand(
                 logger.debug { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(session)
                 receiver.usersToRoom.unassign(assignmentId)
-                receiver.broadcastUpdate()
+                receiver.broadcastUpdate(assignment.user)
             }
         }
     }
