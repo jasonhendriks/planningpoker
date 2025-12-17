@@ -34,7 +34,7 @@ class AssignmentSteps {
 
     @When("the user attempts to vote")
     fun the_user_attempts_to_vote() {
-        assignment = assignment.userVotes(true)
+        assignment = assignment.userVotes("3")
     }
 
     @Then("a vote should be recorded")
