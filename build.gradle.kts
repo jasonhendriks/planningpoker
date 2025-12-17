@@ -40,23 +40,8 @@ val integrationTest = tasks.register<Test>("integrationTest") {
 
 tasks.check { dependsOn(integrationTest) }
 
-ktor {
-    @OptIn(io.ktor.plugin.OpenApiPreview::class)
-    openApi {
-        title = "OpenAPI example"
-        version = "2.1"
-        summary = "This is a sample API"
-    }
-}
-
-// Builds OpenAPI specification automatically
-tasks.processResources {
-//    dependsOn("buildOpenApi")
-}
-
 dependencies {
     implementation(ktorLibs.server.core)
-    implementation(ktorLibs.server.openapi)
     implementation(ktorLibs.server.contentNegotiation)
     implementation(ktorLibs.serialization.kotlinx.json)
     implementation(ktorLibs.server.auth)
