@@ -17,7 +17,6 @@ fun FlowContent.insertSseFragment(assignment: Assignment) =
         classes = setOf("mx-auto w-full")
         attributes["hx-ext"] = "sse"
         attributes["sse-connect"] = "/assignments/${assignment.id}/sse"
-        attributes["hx-push-url"] = "true"
         attributes["sse-swap"] = "update"
     }
 
@@ -27,6 +26,7 @@ fun insertRoomFragment(
         createHTML()
             .div {
 
+                val votingIsInProgress = myAssignment.room.isVotingOpen()
                 val enableStartVotingButton = !myAssignment.room.isVotingOpen()
                 val enableRevealVotesButton = myAssignment.room.isVotingOpen()
 
@@ -68,7 +68,8 @@ fun insertRoomFragment(
                                     buttonCss.plus("opacity-50 cursor-not-allowed")
                                 }
                                 classes = buttonCss
-                                +"Start Vote"
+                                val text = if (myAssignment.room.isVotingNew()) "Start Voting" else "Restart Voting"
+                                +text
                             }
                         }
 
@@ -131,6 +132,9 @@ fun insertRoomFragment(
                         val cards = listOf("1", "2", "3", "5", "8", "13")
                         cards.forEach {
                             div {
+                                if (votingIsInProgress)
+                                    attributes["hx-post"] = "/assignments/${myAssignment.id}/votes/$it"
+
                                 var cssClasses = setOf("card-wrapper")
                                 cssClasses = if (enableStartVotingButton) {
                                     cssClasses.plus("voting-disabled opacity-50 cursor-not-allowed")

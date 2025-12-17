@@ -1,8 +1,8 @@
 package ca.hendriks.planningpoker
 
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
+import ca.hendriks.planningpoker.room.Room
 import ca.hendriks.planningpoker.room.RoomRepository
-import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.web.session.SseSessionManager
 import kotlinx.coroutines.runBlocking
 
@@ -11,13 +11,9 @@ class CommandReceiver(
     val usersToRoom: AssignmentRepository
 ) {
 
-    fun broadcastUpdate(me: User?) = runBlocking {
-        me.let { currentUser ->
-            usersToRoom.findAssignment(currentUser)?.let { assignment ->
-                val assignments = usersToRoom.findAssignments(assignment.room)
-                SseSessionManager.broadcastUpdate(assignments)
-            }
-        }
+    fun broadcastUpdate(room: Room) = runBlocking {
+        val assignments = usersToRoom.findAssignments(room)
+        SseSessionManager.broadcastUpdate(assignments)
     }
 
 }

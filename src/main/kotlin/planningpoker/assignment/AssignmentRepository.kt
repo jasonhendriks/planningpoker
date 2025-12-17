@@ -3,6 +3,7 @@ package ca.hendriks.planningpoker.assignment
 import ca.hendriks.planningpoker.room.Room
 import ca.hendriks.planningpoker.user.User
 import ca.hendriks.planningpoker.util.debug
+import ca.hendriks.planningpoker.util.info
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.slf4j.LoggerFactory
@@ -43,6 +44,14 @@ class AssignmentRepository {
                 mappingsByUser.remove(assignment.user)
                 logger.debug { "Unassigned user ${assignment.user} from ${assignment.room}" }
             }
+        }
+    }
+
+    fun vote(assignmentId: String, value: String) {
+        findAssignment(assignmentId)?.let {
+            val updatedAssignment = it.copy(vote = value)
+            mappingsByUser[it.user] = updatedAssignment
+            logger.info { "User ${it.user} voted '$value' in room ${it.room}" }
         }
     }
 

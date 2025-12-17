@@ -13,10 +13,18 @@ data class Room(val name: String) {
     }
 
     fun isVotingOpen(): Boolean {
-        return voting == VotingState.OPEN
+        return voting.isOpen()
     }
+
+    fun isVotingNew(): Boolean {
+        return voting.isNew()
+    }
+
 }
 
 enum class VotingState {
-    NEW, OPEN, CLOSED
+    NEW, OPEN, CLOSED;
+
+    fun isNew() = this == NEW
+    fun isOpen() = this == OPEN
 }

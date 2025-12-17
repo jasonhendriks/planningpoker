@@ -1,30 +1,23 @@
 package ca.hendriks.planningpoker.web
 
 import ca.hendriks.planningpoker.CommandReceiver
-import ca.hendriks.planningpoker.command.CloseVotingCommand
-import ca.hendriks.planningpoker.command.OpenVotingCommand
 import ca.hendriks.planningpoker.command.SseCommand
 import ca.hendriks.planningpoker.routing.session.UserSession
 import ca.hendriks.planningpoker.util.debug
 import ca.hendriks.planningpoker.web.html.renderIndex
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.application.Application
 import io.ktor.server.html.respondHtml
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.RoutingContext
-import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sse.sse
-import kotlinx.coroutines.runBlocking
 import kotlinx.html.html
 import kotlinx.html.stream.createHTML
 import org.slf4j.LoggerFactory
@@ -59,7 +52,7 @@ fun Application.configureRouting(receiver: CommandReceiver) {
         route("/room/{room-name}") {
             get {
                 val roomName = call.parameters["room-name"]
-                if (roomName == null || roomName.trim().isEmpty()) {
+                if (roomName == null || roomName.isBlank()) {
                     call.respond(BadRequest, "A Room Name is required")
                     return@get
                 }
@@ -86,38 +79,6 @@ fun Application.configureRouting(receiver: CommandReceiver) {
                 .execute()
         }
 
-        route("/room/{room-name}/voting") {
-            post {
-                call.parameters["room-name"]
-                    ?.let { roomName ->
-                        val userSession: UserSession? = call.sessions.get()
-                        OpenVotingCommand(
-                            roomName = roomName,
-                            me = userSession?.user,
-                            receiver = receiver
-                        )
-                            .execute()
-                        respondWithNoContent()
-                    }
-            }
-            delete {
-                call.parameters["room-name"]
-                    ?.let { roomName ->
-                        val userSession: UserSession? = call.sessions.get()
-                        CloseVotingCommand(
-                            roomName = roomName,
-                            me = userSession?.user,
-                            receiver = receiver
-                        )
-                            .execute()
-                        respondWithNoContent()
-                }
-            }
-        }
     }
 
-}
-
-private fun RoutingContext.respondWithNoContent() = runBlocking {
-    call.respond(HttpStatusCode.NoContent, "")
 }

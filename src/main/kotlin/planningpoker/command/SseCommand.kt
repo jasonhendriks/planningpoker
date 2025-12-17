@@ -21,7 +21,7 @@ class SseCommand(
         val assignment = receiver.usersToRoom.findAssignment(assignmentId)
         assignment?.let {
             SseSessionManager.addSession(assignment, session)
-            receiver.broadcastUpdate(assignment.user)
+            receiver.broadcastUpdate(assignment.room)
             try {
                 logger.debug { "Client connected to SSE" }
                 while (true) {
@@ -37,7 +37,7 @@ class SseCommand(
                 logger.debug { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(session)
                 receiver.usersToRoom.unassign(assignmentId)
-                receiver.broadcastUpdate(assignment.user)
+                receiver.broadcastUpdate(assignment.room)
             }
         }
     }
