@@ -27,6 +27,7 @@ fun insertRoomFragment(
             .div {
 
                 val votingIsInProgress = myAssignment.room.isVotingOpen()
+                val votingIsClosed = !votingIsInProgress
                 val enableStartVotingButton = !myAssignment.room.isVotingOpen()
                 val enableRevealVotesButton = myAssignment.room.isVotingOpen()
 
@@ -105,16 +106,22 @@ fun insertRoomFragment(
                             div {
                                 classes = setOf("card-wrapper")
                                 div {
-                                    val cardClasses = setOf("card")
+                                    var cardClasses = setOf("card")
                                     if (it.vote != null) {
-                                        cardClasses.plus("face-down")
+                                        if (votingIsInProgress) {
+                                            cardClasses = cardClasses.plus("face-down")
+                                        } else {
+                                            cardClasses = cardClasses.plus("face-up")
+                                        }
                                     }
                                     classes = cardClasses
                                     // <!-- Card content goes here (e.g., image, text) -->
                                     div {
                                         classes = setOf("")
                                         span {
-                                            +it.vote?.toString().orEmpty()
+                                            if (votingIsClosed) {
+                                                +it.vote.orEmpty()
+                                            }
                                         }
                                     }
                                 }

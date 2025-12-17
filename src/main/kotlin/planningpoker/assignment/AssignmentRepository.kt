@@ -47,12 +47,22 @@ class AssignmentRepository {
         }
     }
 
-    fun vote(assignmentId: String, value: String) {
+    fun vote(assignmentId: String, value: String): Assignment? {
         findAssignment(assignmentId)?.let {
             val updatedAssignment = it.copy(vote = value)
             mappingsByUser[it.user] = updatedAssignment
             logger.info { "User ${it.user} voted '$value' in room ${it.room}" }
+            return updatedAssignment
         }
+        return null
+    }
+
+    fun resetVotes(room: Room) {
+        mappingsByUser
+            .filterValues { it.room == room }
+            .forEach {
+                mappingsByUser[it.value.user] = it.value.copy(vote = null)
+            }
     }
 
 }

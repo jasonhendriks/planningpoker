@@ -11,6 +11,7 @@ class OpenVotingCommand(val roomName: String, val receiver: CommandReceiver) : C
     override fun execute() {
         val room = receiver.roomRepository.findOrCreateRoom(roomName)
         room.openVoting()
+        receiver.usersToRoom.resetVotes(room)
         receiver.broadcastUpdate(room)
         logger.info { "Voting in room $roomName opened" }
     }
