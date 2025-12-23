@@ -14,7 +14,7 @@ import kotlinx.html.stream.createHTML
 fun FlowContent.insertSseFragment(assignment: Assignment) =
     div {
         id = "room-sse"
-        classes = setOf("mx-auto w-full")
+        classes = setOf("w-full")
         attributes["hx-ext"] = "sse"
         attributes["sse-connect"] = "/assignments/${assignment.id}/sse"
         attributes["sse-swap"] = "update"
@@ -69,7 +69,7 @@ fun insertRoomFragment(
                                     buttonCss.plus("opacity-50 cursor-not-allowed")
                                 }
                                 classes = buttonCss
-                                val text = if (myAssignment.room.isVotingNew()) "Start Voting" else "Restart Voting"
+                                val text = if (myAssignment.room.isVotingNew()) "Start Voting" else "Reset"
                                 +text
                             }
                         }
@@ -117,7 +117,7 @@ fun insertRoomFragment(
                                     classes = cardClasses
                                     // <!-- Card content goes here (e.g., image, text) -->
                                     div {
-                                        classes = setOf("")
+                                        classes = setOf("corner top-left")
                                         span {
                                             if (votingIsClosed) {
                                                 +it.vote.orEmpty()

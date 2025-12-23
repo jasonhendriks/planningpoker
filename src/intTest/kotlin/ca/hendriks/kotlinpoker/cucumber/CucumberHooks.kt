@@ -1,8 +1,8 @@
 package ca.hendriks.kotlinpoker.cucumber
 
 import ca.hendriks.planningpoker.assignment.AssignmentRepository
-import ca.hendriks.planningpoker.ktor
 import ca.hendriks.planningpoker.room.RoomRepository
+import ca.hendriks.planningpoker.web.ktor
 import io.cucumber.java.AfterAll
 import io.cucumber.java.BeforeAll
 import io.cucumber.java.en.Given

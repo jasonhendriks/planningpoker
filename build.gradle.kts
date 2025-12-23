@@ -53,6 +53,7 @@ dependencies {
     implementation(ktorLibs.server.sse)
     implementation(ktorLibs.server.webjars)
     implementation(ktorLibs.server.htmlBuilder)
+    implementation(ktorLibs.server.statusPages)
     implementation(libs.bundles.htmx)
     implementation(libs.logback.classic)
 

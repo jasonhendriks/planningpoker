@@ -36,8 +36,8 @@ class SseCommand(
             } finally {
                 logger.debug { "Client disconnected from SSE" }
                 SseSessionManager.removeSession(session)
-                receiver.usersToRoom.unassign(assignmentId)
-                receiver.broadcastUpdate(assignment.room)
+                RemoveAssignmentCommand(assignmentId, null, receiver)
+                    .execute()
             }
         }
     }
