@@ -63,7 +63,7 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5.jvm)
 
     intTestImplementation("org.junit.platform:junit-platform-suite")
-    intTestImplementation("org.seleniumhq.selenium:selenium-java:4.39.0")
+    intTestImplementation("org.seleniumhq.selenium:selenium-java:4.40.0")
     intTestImplementation(ktorLibs.client.cio)
     intTestImplementation(ktorLibs.client.core)
     intTestImplementation(libs.bundles.cucumber.libs)
