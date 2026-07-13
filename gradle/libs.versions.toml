@@ -7,7 +7,7 @@ logback = "1.5.27"
 [libraries]
 cucumber-java = { group = "io.cucumber", name = "cucumber-java", version.ref = "cucumber" }
 cucumber-junit-platform-engine = { group = "io.cucumber", name = "cucumber-junit-platform-engine", version.ref = "cucumber" }
-htmx = { module = "org.webjars.npm:htmx.org", version = "2.0.8" }
+htmx = { module = "org.webjars.npm:htmx.org", version = "2.0.10" }
 htmx-ext-sse = { module = "org.webjars.npm:htmx-ext-sse", version = "2.2.4" }
 htmx-path-params = { module = "org.webjars.npm:htmx-ext-path-params", version = "2.0.0" }
 kotest-assertions-core-jvm = { group = "io.kotest", name = "kotest-assertions-core-jvm", version.ref = "kotest" }
